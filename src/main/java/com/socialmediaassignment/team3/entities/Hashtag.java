@@ -1,26 +1,46 @@
 package com.socialmediaassignment.team3.entities;
 
-import lombok.Data;
+import com.sun.istack.NotNull;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
+import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
+import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @NoArgsConstructor
-@Data
+@Getter
+@Setter
 public class Hashtag {
     @Id
     @GeneratedValue
     private Long id;
 
-    @Column(unique = true)
+    @NotNull
     private String label;
 
-    /*
-    TODO: Add fields for firstUsed and lastUsed
-     */
+    @ManyToMany(mappedBy = "hashtags")
+    private Set<Tweet> tweets = new HashSet<>();
 
-    @ManyToMany
-    private List<Tweet> tweets;
+    @Column(name = "created_on")
+    @CreationTimestamp
+    private Date firstUsed;
+
+    @NotNull
+    private Date lastUsed;
+
+    public void addTweet(Tweet tweet) {
+        this.tweets.add(tweet);
+        tweet.getHashtags().add(this);
+    }
+
+    public void removeTweet(Tweet tweet) {
+        this.tweets.remove(tweet);
+        tweet.getHashtags().remove(this);
+    }
 }
