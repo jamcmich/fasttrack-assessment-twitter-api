@@ -1,5 +1,6 @@
 package com.socialmediaassignment.team3;
 
+import com.socialmediaassignment.team3.entities.Hashtag;
 import com.socialmediaassignment.team3.entities.Tweet;
 import com.socialmediaassignment.team3.entities.User;
 import com.socialmediaassignment.team3.entities.embeddable.Credential;
@@ -68,5 +69,11 @@ public class Seeder implements CommandLineRunner {
         userRepository.saveAndFlush(s1);
         userRepository.saveAndFlush(s2);
         System.out.println(tw1.getUsersMentioned().size());
+
+        Hashtag hashtag = new Hashtag();
+        hashtag.setLabel("some-hashtag-label");
+        hashtag.setTweets(Set.of(tweet, tweet1));
+        hashtagRepository.saveAndFlush(hashtag);
+        System.out.println(hashtag.getLabel());
     }
 }
