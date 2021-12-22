@@ -11,15 +11,13 @@ import java.util.List;
 @Data
 public class Hashtag {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(unique = true)
     private String label;
 
-    /*
-    TODO: Add fields for firstUsed and lastUsed
-     */
+    // TODO: Add fields for firstUsed and lastUsed
 
     @ManyToMany
     private List<Tweet> tweets;

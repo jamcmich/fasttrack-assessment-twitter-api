@@ -1,10 +1,10 @@
 package com.socialmediaassignment.team3.controllers;
 
 import com.socialmediaassignment.team3.dtos.UserResponseDto;
-import com.socialmediaassignment.team3.entities.User;
 import com.socialmediaassignment.team3.mappers.UserMapper;
 import com.socialmediaassignment.team3.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,12 +16,14 @@ import java.util.List;
 @RequestMapping("/user")
 public class UserController {
 
+    @Autowired
     private final UserRepository userRepository;
+
+    @Autowired
     private final UserMapper userMapper;
 
-
     @GetMapping
-    public List<UserResponseDto> getAllUser() {
+    public List<UserResponseDto> getAllUsers() {
         return userMapper.entitiesToDtos(userRepository.findAll());
     }
 }
