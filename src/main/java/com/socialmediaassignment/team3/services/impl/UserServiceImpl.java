@@ -16,8 +16,16 @@ public class UserServiceImpl implements UserService {
 
     // Checks whether a given username exists.
     public Boolean validateUsername(String username) {
-        User user = userRepository.findByCredentialUsername(username);
+        return userRepository.findByCredentialUsername(username) != null;
+    }
 
-        return user != null;
+    // Retrieves a user with the given username.
+    public User getUsername(String username) throws Exception {
+        User result = userRepository.findByCredentialUsername(username);
+
+        if (result == null || result.isDeleted()) {
+            throw new Exception("The requested username " + username + " does not exist!");
+        }
+        return result;
     }
 }

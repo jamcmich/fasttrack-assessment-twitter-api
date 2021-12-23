@@ -32,4 +32,10 @@ public class UserController {
     public Boolean validateUsername(@PathVariable String username) {
         return userService.validateUsername(username);
     }
+
+    // Retrieves a user with the given username.
+    @GetMapping("/@{username}")
+    public User getUsername(@PathVariable String username) throws Exception {
+        return userService.getUsername(username);
+    }
 }
