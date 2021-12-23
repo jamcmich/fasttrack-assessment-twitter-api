@@ -27,7 +27,7 @@ public class HashtagController {
 
     // Checks whether a given hashtag exists.
     @GetMapping("/validate/tag/exists/{label}")
-    public Boolean getHashtag(@PathVariable String label) {
-        return hashtagService.getHashtag(label);
+    public Boolean validateHashtag(@PathVariable String label) {
+        return hashtagService.validateHashtag(label);
     }
 }

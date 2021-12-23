@@ -15,7 +15,7 @@ public class HashtagServiceImpl implements HashtagService {
     private final HashtagRepository hashtagRepository;
 
     // Checks whether a given hashtag exists.
-    public Boolean getHashtag(String label) {
+    public Boolean validateHashtag(String label) {
         Hashtag hashtag = hashtagRepository.findByLabel(label);
 
         return hashtag != null;
