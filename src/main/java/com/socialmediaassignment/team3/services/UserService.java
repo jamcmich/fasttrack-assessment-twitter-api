@@ -18,4 +18,6 @@ public interface UserService {
     UserResponseDto updateUser(String username, UserRequestDto userRequestDto);
 
     UserResponseDto deleteUser(String username, Credential credential);
+
+    void followUser(String username, Credential credential);
 }

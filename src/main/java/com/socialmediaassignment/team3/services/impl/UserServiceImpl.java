@@ -74,6 +74,19 @@ public class UserServiceImpl implements UserService {
         return userMapper.entityToDto(userRepository.saveAndFlush(toDelete));
     }
 
+    @Override
+    public void followUser(String username, Credential credential) {
+        User toBeFollowed = _getUserByUsername(username);
+        User follower = _getUserByUsername(credential.getUsername());
+        if (!isActive(toBeFollowed) || !isActive(follower))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found");
+        if (follower.getFollowing().contains(toBeFollowed))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Already following");
+        follower.addFollowing(toBeFollowed);
+        userRepository.saveAndFlush(follower);
+        userRepository.saveAndFlush(toBeFollowed);
+    }
+
     // Auxiliary functions
 
     private boolean existsUsername(String username) {
@@ -91,6 +104,10 @@ public class UserServiceImpl implements UserService {
         user.setCredential(userRequestDto.getCredential());
         user.setProfile(userRequestDto.getProfile());
         return user;
+    }
+
+    private boolean isActive(User user) {
+        return user != null && !user.isDeleted();
     }
 
 }
