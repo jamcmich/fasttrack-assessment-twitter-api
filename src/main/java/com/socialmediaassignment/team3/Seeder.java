@@ -79,35 +79,5 @@ public class Seeder implements CommandLineRunner {
             }
         }
         userRepository.saveAllAndFlush(tempFollowings);
-
-//
-//        Tweet tweet = new Tweet();
-//        tweet.setAuthor(s1);
-//        tweet.setContent("Super tweet");
-//        Tweet savedTweet = tweetRepository.saveAndFlush(tweet);
-//
-//        Tweet tweet1 = new Tweet();
-//        tweet1.setAuthor(s1);
-//        tweet1.setContent("Tweet 2");
-//        tweet1.setRepostOf(savedTweet);
-//        tweet1.setInReplyTo(savedTweet);
-//        Tweet savedTweet1 = tweetRepository.saveAndFlush(tweet1);
-//
-//        savedTweet1.addLike(s2);
-//        savedTweet1.addMentionedUser(s1);
-//
-//        Tweet tw1 = tweetRepository.saveAndFlush(savedTweet1);
-//        userRepository.saveAndFlush(s1);
-//        userRepository.saveAndFlush(s2);
-//        System.out.println(tw1.getUsersMentioned().size());
-//
-//        Hashtag hashtag = new Hashtag();
-//        hashtag.setLabel("some-hashtag-label");
-//        hashtag.setTweets(Set.of(tweet, tweet1));
-//        hashtagRepository.saveAndFlush(hashtag);
-//        System.out.println(hashtag.getLabel());
-//
-//        System.out.println(user1.getCredential().getUsername());
-//        System.out.println(user1.getFollowers());
     }
 }
