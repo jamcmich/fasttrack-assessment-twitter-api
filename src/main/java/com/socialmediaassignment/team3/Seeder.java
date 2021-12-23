@@ -12,7 +12,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import java.util.HashSet;
+import java.util.Random;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -43,9 +46,17 @@ public class Seeder implements CommandLineRunner {
 
         user1Saved.addFollowing(user2Saved);
         user2Saved.addFollower(user1Saved);
+        user2Saved.addFollowing(user1Saved);
+        user1Saved.addFollower(user2Saved);
+
+        System.out.println(user2Saved.getFollowing().size());
+        System.out.println(user2Saved.getFollowers().size());
 
         User s1 = userRepository.saveAndFlush(user1Saved);
         User s2 = userRepository.saveAndFlush(user2Saved);
+
+        System.out.println(s2.getFollowing().size());
+        System.out.println(s2.getFollowers().size());
 
         Tweet tweet = new Tweet();
         tweet.setAuthor(s1);
@@ -65,14 +76,44 @@ public class Seeder implements CommandLineRunner {
         Tweet tw1 = tweetRepository.saveAndFlush(savedTweet1);
         userRepository.saveAndFlush(s1);
         userRepository.saveAndFlush(s2);
-        System.out.println(tw1.getUsersMentioned().size());
+
+
 
         Hashtag hashtag = new Hashtag();
         hashtag.setLabel("some-hashtag-label");
         hashtag.setTweets(Set.of(tweet, tweet1));
         hashtagRepository.saveAndFlush(hashtag);
-        System.out.println(hashtag.getLabel());
 
-        System.out.println(user1.getCredential().getUsername());
+        Set<User> testUsers = new HashSet<>();
+        for (int i = 0; i < 10; i++) {
+            Credential credential = new Credential(
+                    "test-username-" + i,
+                    "test-password-" + i
+            );
+
+            Profile profile = new Profile(
+                    "test-firstname-" + i,
+                    "test-lastname-" + i,
+                    "test-email-" + i + "@email.com",
+                    "123-456-78" + i
+            );
+
+            User user = new User();
+            user.setCredential(credential);
+            user.setDeleted(new Random().nextBoolean());
+            user.setProfile(profile);
+            testUsers.add(userRepository.saveAndFlush(user));
+        }
+
+        for (User user : testUsers) {
+            for (User toFollow : testUsers.stream().filter(u -> u.getId() != user.getId()).collect(Collectors.toList())) {
+                user.addFollowing(toFollow);
+                toFollow.addFollower(user);
+                System.out.println(user.getId() + " - " + toFollow.getId());
+            }
+        }
+        for (User user : testUsers) {
+            userRepository.saveAndFlush(user);
+        }
     }
 }

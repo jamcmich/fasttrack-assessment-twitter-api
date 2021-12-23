@@ -1,6 +1,6 @@
 package com.socialmediaassignment.team3.services;
 
-import com.socialmediaassignment.team3.dtos.UserCreateDto;
+import com.socialmediaassignment.team3.dtos.UserRequestDto;
 import com.socialmediaassignment.team3.dtos.UserResponseDto;
 
 import java.util.List;
@@ -8,9 +8,11 @@ import java.util.List;
 public interface UserService {
     List<UserResponseDto> getActiveUsers ();
 
-    UserResponseDto createUser(UserCreateDto userCreateDto);
+    UserResponseDto createUser(UserRequestDto userRequestDto);
 
     UserResponseDto getUserByUsername(String username);
 
     Boolean validateUsername(String username);
+
+    UserResponseDto updateUser(String username, UserRequestDto userRequestDto);
 }

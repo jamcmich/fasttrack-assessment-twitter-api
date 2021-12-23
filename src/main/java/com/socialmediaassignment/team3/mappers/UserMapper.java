@@ -1,10 +1,9 @@
 package com.socialmediaassignment.team3.mappers;
 
-import com.socialmediaassignment.team3.dtos.UserCreateDto;
+import com.socialmediaassignment.team3.dtos.UserRequestDto;
 import com.socialmediaassignment.team3.dtos.UserResponseDto;
 import com.socialmediaassignment.team3.entities.User;
 import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
 
 import java.util.List;
 
@@ -14,5 +13,5 @@ public interface UserMapper {
 
     List<UserResponseDto> entitiesToDtos (List<User> entities);
 
-    User createDtoToEntity (UserCreateDto userCreateDto);
+    User createDtoToEntity (UserRequestDto userRequestDto);
 }

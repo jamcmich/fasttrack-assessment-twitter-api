@@ -1,9 +1,10 @@
 package com.socialmediaassignment.team3.controllers;
 
-import com.socialmediaassignment.team3.dtos.UserCreateDto;
+import com.socialmediaassignment.team3.dtos.UserRequestDto;
 import com.socialmediaassignment.team3.dtos.UserResponseDto;
 import com.socialmediaassignment.team3.services.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,13 +25,19 @@ public class UserController {
     }
 
     @PostMapping
-    public UserResponseDto createUser(@RequestBody UserCreateDto userCreateDto) {
-        return userService.createUser(userCreateDto);
+    @ResponseStatus(code = HttpStatus.CREATED)
+    public UserResponseDto createUser(@RequestBody UserRequestDto userRequestDto) {
+        return userService.createUser(userRequestDto);
     }
 
     @GetMapping("/@{username}")
     public UserResponseDto getUserByUsername(@PathVariable String username) {
         return userService.getUserByUsername(username);
+    }
+
+    @PatchMapping("/@{username}")
+    public UserResponseDto updateUser(@PathVariable String username, @RequestBody UserRequestDto userRequestDto) {
+        return userService.updateUser(username, userRequestDto);
     }
 
     // Checks whether a given username exists.

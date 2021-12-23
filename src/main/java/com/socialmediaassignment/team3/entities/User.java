@@ -40,7 +40,7 @@ public class User {
     @OneToMany(mappedBy = "author")
     private Set<Tweet> tweets = new HashSet<>();
 
-    @ManyToMany(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "tweet_like_mapping",
             joinColumns = {@JoinColumn(name = "tweet_id")},
             inverseJoinColumns = {@JoinColumn(name = "user_id")}
@@ -54,14 +54,14 @@ public class User {
     )
     private Set<Tweet> mentions = new HashSet<>();
 
-    @ManyToMany(cascade={CascadeType.ALL}, fetch = FetchType.EAGER)
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name="follower_following_mapping",
         joinColumns = {@JoinColumn(name="follower_id")},
         inverseJoinColumns = {@JoinColumn(name="following_id")}
     )
     private Set<User> following = new HashSet<>();
 
-    @ManyToMany(mappedBy = "following")
+    @ManyToMany(mappedBy = "following", fetch = FetchType.EAGER)
     private Set<User> followers = new HashSet<>();
 
     public void addFollower(User follower) {
