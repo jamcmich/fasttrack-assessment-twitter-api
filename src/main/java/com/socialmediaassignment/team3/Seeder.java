@@ -49,14 +49,8 @@ public class Seeder implements CommandLineRunner {
         user2Saved.addFollowing(user1Saved);
         user1Saved.addFollower(user2Saved);
 
-        System.out.println(user2Saved.getFollowing().size());
-        System.out.println(user2Saved.getFollowers().size());
-
         User s1 = userRepository.saveAndFlush(user1Saved);
         User s2 = userRepository.saveAndFlush(user2Saved);
-
-        System.out.println(s2.getFollowing().size());
-        System.out.println(s2.getFollowers().size());
 
         Tweet tweet = new Tweet();
         tweet.setAuthor(s1);
@@ -109,7 +103,6 @@ public class Seeder implements CommandLineRunner {
             for (User toFollow : testUsers.stream().filter(u -> u.getId() != user.getId()).collect(Collectors.toList())) {
                 user.addFollowing(toFollow);
                 toFollow.addFollower(user);
-                System.out.println(user.getId() + " - " + toFollow.getId());
             }
         }
         for (User user : testUsers) {

@@ -2,6 +2,7 @@ package com.socialmediaassignment.team3.controllers;
 
 import com.socialmediaassignment.team3.dtos.UserRequestDto;
 import com.socialmediaassignment.team3.dtos.UserResponseDto;
+import com.socialmediaassignment.team3.entities.embeddable.Credential;
 import com.socialmediaassignment.team3.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -38,6 +39,11 @@ public class UserController {
     @PatchMapping("/@{username}")
     public UserResponseDto updateUser(@PathVariable String username, @RequestBody UserRequestDto userRequestDto) {
         return userService.updateUser(username, userRequestDto);
+    }
+
+    @DeleteMapping("/@{username}")
+    public UserResponseDto deleteUser(@PathVariable String username, @RequestBody Credential credential) {
+        return userService.deleteUser(username, credential);
     }
 
     // Checks whether a given username exists.

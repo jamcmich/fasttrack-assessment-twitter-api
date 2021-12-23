@@ -3,6 +3,7 @@ package com.socialmediaassignment.team3.services.impl;
 import com.socialmediaassignment.team3.dtos.UserRequestDto;
 import com.socialmediaassignment.team3.dtos.UserResponseDto;
 import com.socialmediaassignment.team3.entities.User;
+import com.socialmediaassignment.team3.entities.embeddable.Credential;
 import com.socialmediaassignment.team3.mappers.UserMapper;
 import com.socialmediaassignment.team3.repositories.UserRepository;
 import com.socialmediaassignment.team3.services.UserService;
@@ -62,6 +63,15 @@ public class UserServiceImpl implements UserService {
         toUpdate = _setCredentialAndProfile(toUpdate, userRequestDto);
         toUpdate.getCredential().setUsername(username);
         return userMapper.entityToDto(userRepository.saveAndFlush(toUpdate));
+    }
+
+    @Override
+    public UserResponseDto deleteUser(String username, Credential credential) {
+        User toDelete = _getUserByUsername(username);
+        if (toDelete == null || toDelete.isDeleted())
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User does not exist");
+        toDelete.setDeleted(true);
+        return userMapper.entityToDto(userRepository.saveAndFlush(toDelete));
     }
 
     // Auxiliary functions
