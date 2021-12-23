@@ -1,6 +1,9 @@
 package com.socialmediaassignment.team3.entities;
 
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.socialmediaassignment.team3.entities.embeddable.Credential;
 import com.socialmediaassignment.team3.entities.embeddable.Profile;
 import lombok.Getter;
@@ -16,6 +19,7 @@ import java.util.*;
 @Getter
 @Setter
 @Table(name = "user_table")
+@JsonIgnoreProperties({"followers", "following", "likedTweets", "tweets", "mentions", "profile", "credential"})
 public class User {
     @Id
     @GeneratedValue
@@ -41,7 +45,6 @@ public class User {
             joinColumns = {@JoinColumn(name = "tweet_id")},
             inverseJoinColumns = {@JoinColumn(name = "user_id")}
     )
-    @JsonIgnore
     private Set<Tweet> likedTweets = new HashSet<>();
 
     @ManyToMany(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
@@ -49,7 +52,6 @@ public class User {
         joinColumns = {@JoinColumn(name = "tweet_id")},
         inverseJoinColumns = {@JoinColumn(name = "user_id")}
     )
-    @JsonIgnore
     private Set<Tweet> mentions = new HashSet<>();
 
     @ManyToMany(cascade={CascadeType.ALL}, fetch = FetchType.EAGER)
@@ -57,11 +59,9 @@ public class User {
         joinColumns = {@JoinColumn(name="follower_id")},
         inverseJoinColumns = {@JoinColumn(name="following_id")}
     )
-    @JsonIgnore
     private Set<User> following = new HashSet<>();
 
     @ManyToMany(mappedBy = "following")
-    @JsonIgnore
     private Set<User> followers = new HashSet<>();
 
     public void addFollower(User follower) {

@@ -1,6 +1,6 @@
 package com.socialmediaassignment.team3.entities;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.sun.istack.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -10,13 +10,13 @@ import org.hibernate.annotations.CreationTimestamp;
 import javax.persistence.*;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Entity
 @NoArgsConstructor
 @Getter
 @Setter
+@JsonIgnoreProperties({"reposts", "repostOf", "hashtags", "author", "usersMentioned", "likes", "replies", "inReplyTo"})
 public class Tweet {
     @Id
     @GeneratedValue
@@ -25,7 +25,6 @@ public class Tweet {
     @ManyToOne
     @JoinColumn(name = "author_id")
     @NotNull
-    @JsonIgnore
     private User author;
 
     @ManyToMany(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
@@ -33,33 +32,26 @@ public class Tweet {
             joinColumns = {@JoinColumn(name = "hashtag_id")},
             inverseJoinColumns = {@JoinColumn(name = "tweet_id")}
     )
-    @JsonIgnore
     private Set<Hashtag> hashtags = new HashSet<>();
 
     @ManyToMany(mappedBy = "mentions")
-    @JsonIgnore
     private Set<User> usersMentioned = new HashSet<>();
 
     @ManyToMany(mappedBy = "likedTweets")
-    @JsonIgnore
     private Set<User> likes = new HashSet<>();
 
     @OneToMany(mappedBy = "repostOf")
-    @JsonIgnore
     private Set<Tweet> reposts = new HashSet<>();
 
     @ManyToOne
     @JoinColumn(name = "repost_id")
-    @JsonIgnore
     private Tweet repostOf;
 
     @OneToMany(mappedBy = "inReplyTo")
-    @JsonIgnore
     private Set<Tweet> replies = new HashSet<>();
 
     @ManyToOne
     @JoinColumn(name = "reply_to_id")
-    @JsonIgnore
     private Tweet inReplyTo;
 
     private String content;

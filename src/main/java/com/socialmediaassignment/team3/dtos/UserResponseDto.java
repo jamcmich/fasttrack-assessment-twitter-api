@@ -17,10 +17,10 @@ public class UserResponseDto {
     private Credential credential;
     private Profile profile;
     private Date joined;
-//    private boolean deleted;
-//    private Set<Tweet> tweets;
+    private boolean deleted;
+    private Set<Tweet> tweets;
     private Set<Tweet> likedTweets;
     private Set<Tweet> mentions;
-//    private Set<User> following;
-//    private Set<User> followers;
+    private Set<User> following;
+    private Set<User> followers;
 }

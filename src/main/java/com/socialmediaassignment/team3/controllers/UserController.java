@@ -1,7 +1,6 @@
 package com.socialmediaassignment.team3.controllers;
 
 import com.socialmediaassignment.team3.dtos.UserResponseDto;
-import com.socialmediaassignment.team3.entities.User;
 import com.socialmediaassignment.team3.mappers.UserMapper;
 import com.socialmediaassignment.team3.repositories.UserRepository;
 import lombok.RequiredArgsConstructor;
