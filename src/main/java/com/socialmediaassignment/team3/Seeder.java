@@ -12,6 +12,7 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -22,11 +23,6 @@ public class Seeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        /*
-            Generators for less redundant code.
-         */
-
-        // Generates random test users.
         Set<User> testUsers = new HashSet<>();
         for (int i = 0; i < 10; i++) {
             Credential credential = new Credential(
@@ -45,9 +41,24 @@ public class Seeder implements CommandLineRunner {
             user.setCredential(credential);
             user.setDeleted(new Random().nextBoolean());
             user.setProfile(profile);
-            testUsers.add(user);
+            testUsers.add(userRepository.saveAndFlush(user));
         }
-        userRepository.saveAllAndFlush(testUsers);
+
+        for (User user : testUsers) {
+            for (User toFollow : testUsers.stream().filter(u -> u.getId() != user.getId()).collect(Collectors.toList())) {
+                user.addFollowing(toFollow);
+                toFollow.addFollower(user);
+            }
+        }
+
+        Set<User> tempUserSet = new HashSet<>();
+
+        for (User user : testUsers) {
+            tempUserSet.add(userRepository.saveAndFlush(user));
+        }
+
+        testUsers = tempUserSet;
+
 
         // Generates random test tweets.
         Set<Tweet> testTweets = new HashSet<>();
@@ -58,29 +69,9 @@ public class Seeder implements CommandLineRunner {
             tweet.setContent("test-tweet-" + i);
             tweet.setDeleted(new Random().nextBoolean());
 
-            testTweets.add(tweet);
+            testTweets.add(tweetRepository.saveAndFlush(tweet));
         }
-        tweetRepository.saveAllAndFlush(testTweets);
 
-        // Generates random followers.
-        List<User> tempFollowers = new ArrayList<>(testUsers);
-        for (User user : tempFollowers) {
-            int rand = new Random().nextInt(tempFollowers.size());
-            if (user != tempFollowers.get(rand) && !tempFollowers.contains(user)) {
-                user.addFollower(tempFollowers.get(rand));
-            }
-        }
-        userRepository.saveAllAndFlush(tempFollowers);
-
-        // Generates random followings.
-        List<User> tempFollowings = new ArrayList<>(testUsers);
-        for (User user : tempFollowings) {
-            int rand = new Random().nextInt(tempFollowings.size());
-            if (user != tempFollowings.get(rand)) {
-                user.addFollower(tempFollowings.get(rand));
-            }
-        }
-        userRepository.saveAllAndFlush(tempFollowings);
 
         /*
             Custom test cases go here.
