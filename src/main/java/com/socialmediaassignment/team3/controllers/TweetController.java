@@ -2,10 +2,12 @@ package com.socialmediaassignment.team3.controllers;
 
 import com.socialmediaassignment.team3.dtos.TweetRequestDto;
 import com.socialmediaassignment.team3.dtos.TweetResponseDto;
+import com.socialmediaassignment.team3.entities.embeddable.Credential;
 import com.socialmediaassignment.team3.mappers.TweetMapper;
 import com.socialmediaassignment.team3.repositories.TweetRepository;
 import com.socialmediaassignment.team3.services.TweetService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,8 +29,14 @@ public class TweetController {
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     public TweetResponseDto createTweet(@RequestBody TweetRequestDto tweetRequestDto) {
         return tweetService.createTweet(tweetRequestDto);
+    }
+
+    @PostMapping("/{id}/like")
+    public void likeTweetById(@PathVariable Long id, @RequestBody Credential credential) {
+        tweetService.likeTweetById(id, credential);
     }
 
 }

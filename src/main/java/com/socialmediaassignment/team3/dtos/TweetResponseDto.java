@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.Set;
 
 @NoArgsConstructor
 @Data
@@ -16,4 +17,5 @@ public class TweetResponseDto {
     private Date posted;
     private Tweet inReplyTo;
     private Tweet repostOf;
+    private Set<User> likes;
 }

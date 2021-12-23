@@ -5,6 +5,7 @@ import com.socialmediaassignment.team3.dtos.TweetRequestDto;
 import com.socialmediaassignment.team3.dtos.TweetResponseDto;
 import com.socialmediaassignment.team3.entities.Tweet;
 import com.socialmediaassignment.team3.entities.User;
+import com.socialmediaassignment.team3.entities.embeddable.Credential;
 import com.socialmediaassignment.team3.mappers.TweetMapper;
 import com.socialmediaassignment.team3.repositories.TweetRepository;
 import com.socialmediaassignment.team3.repositories.UserRepository;
@@ -48,6 +49,19 @@ public class TweetServiceImpl implements TweetService {
         tweet.setAuthor(author);
         tweet.setContent(tweetRequestDto.getContent());
         return tweetMapper.entityToDto(tweetRepository.saveAndFlush(tweet));
+    }
+
+    @Override
+    public void likeTweetById(Long id, Credential credential) {
+        User user = _getUserByUsername(credential.getUsername());
+        if (user == null || user.isDeleted())
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User does not exist");
+        Optional<Tweet> tweetOptional = tweetRepository.findById(id);
+        if (tweetOptional.isEmpty())
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Tweet not found");
+        Tweet tweet = tweetOptional.get();
+        user.addLikedTweet(tweet);
+        userRepository.saveAndFlush(user);
     }
 
     private User _getUserByUsername(String username) {
