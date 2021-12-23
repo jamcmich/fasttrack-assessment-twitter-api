@@ -1,22 +1,30 @@
 package com.socialmediaassignment.team3.services.impl;
 
+<<<<<<< HEAD
 import com.socialmediaassignment.team3.dtos.UserCreateDto;
 import com.socialmediaassignment.team3.dtos.UserResponseDto;
+=======
+>>>>>>> a458223bea0a77de757914629001761ebecd1df2
 import com.socialmediaassignment.team3.entities.User;
 import com.socialmediaassignment.team3.mappers.UserMapper;
 import com.socialmediaassignment.team3.repositories.UserRepository;
 import com.socialmediaassignment.team3.services.UserService;
 import lombok.RequiredArgsConstructor;
+<<<<<<< HEAD
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.stream.Collectors;
+=======
+import org.springframework.stereotype.Service;
+>>>>>>> a458223bea0a77de757914629001761ebecd1df2
 
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
+<<<<<<< HEAD
     private final UserRepository userRepository;
     private final UserMapper userMapper;
 
@@ -58,5 +66,16 @@ public class UserServiceImpl implements UserService {
         if (userList.size() == 0)
             return null;
         return userList.get(0);
+=======
+
+    private final UserMapper userMapper;
+    private final UserRepository userRepository;
+
+    // Checks whether a given username exists.
+    public Boolean validateUsername(String username) {
+        User user = userRepository.findByCredentialUsername(username);
+
+        return user != null;
+>>>>>>> a458223bea0a77de757914629001761ebecd1df2
     }
 }

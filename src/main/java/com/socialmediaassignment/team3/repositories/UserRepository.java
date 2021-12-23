@@ -9,5 +9,9 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
+<<<<<<< HEAD
     List<User> findByCredentialUsername(String username);
+=======
+    User findByCredentialUsername(String username);
+>>>>>>> a458223bea0a77de757914629001761ebecd1df2
 }
