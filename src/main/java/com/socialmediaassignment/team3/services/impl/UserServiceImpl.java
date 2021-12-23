@@ -1,8 +1,9 @@
 package com.socialmediaassignment.team3.services.impl;
 
-import com.socialmediaassignment.team3.dtos.UserCreateDto;
+import com.socialmediaassignment.team3.dtos.UserRequestDto;
 import com.socialmediaassignment.team3.dtos.UserResponseDto;
 import com.socialmediaassignment.team3.entities.User;
+import com.socialmediaassignment.team3.entities.embeddable.Credential;
 import com.socialmediaassignment.team3.mappers.UserMapper;
 import com.socialmediaassignment.team3.repositories.UserRepository;
 import com.socialmediaassignment.team3.services.UserService;
@@ -28,13 +29,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public UserResponseDto createUser(UserCreateDto userCreateDto) {
-        User user = _getUserByUsername(userCreateDto.getCredential().getUsername());
+    public UserResponseDto createUser(UserRequestDto userRequestDto) {
+        User user = _getUserByUsername(userRequestDto.getCredential().getUsername());
         if (user == null)
-            user = userMapper.createDtoToEntity(userCreateDto);
+            user = userMapper.createDtoToEntity(userRequestDto);
         else if (user.isDeleted()) {
-            user.setCredential(userCreateDto.getCredential());
-            user.setProfile(userCreateDto.getProfile());
+            user = _setCredentialAndProfile(user, userRequestDto);
         }
         else
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username must be unique");
@@ -49,6 +49,59 @@ public class UserServiceImpl implements UserService {
         return userMapper.entityToDto(user);
     }
 
+    // Checks whether a given username exists.
+    @Override
+    public Boolean validateUsername(String username) {
+        return _getUserByUsername(username) != null;
+    }
+
+    @Override
+    public UserResponseDto updateUser(String username, UserRequestDto userRequestDto) {
+        User toUpdate = _getUserByUsername(username);
+        if (toUpdate == null || toUpdate.isDeleted())
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User does not exist");
+        toUpdate = _setCredentialAndProfile(toUpdate, userRequestDto);
+        toUpdate.getCredential().setUsername(username);
+        return userMapper.entityToDto(userRepository.saveAndFlush(toUpdate));
+    }
+
+    @Override
+    public UserResponseDto deleteUser(String username, Credential credential) {
+        User toDelete = _getUserByUsername(username);
+        if (toDelete == null || toDelete.isDeleted())
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User does not exist");
+        toDelete.setDeleted(true);
+        return userMapper.entityToDto(userRepository.saveAndFlush(toDelete));
+    }
+
+    @Override
+    public void followUser(String username, Credential credential) {
+        User toBeFollowed = _getUserByUsername(username);
+        User follower = _getUserByUsername(credential.getUsername());
+        if (!isActive(toBeFollowed) || !isActive(follower))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found");
+        if (follower.getFollowing().contains(toBeFollowed))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Already following");
+        follower.addFollowing(toBeFollowed);
+        userRepository.saveAndFlush(follower);
+        userRepository.saveAndFlush(toBeFollowed);
+    }
+
+    @Override
+    public void unFollowUser(String username, Credential credential) {
+        User toBeFollowed = _getUserByUsername(username);
+        User follower = _getUserByUsername(credential.getUsername());
+        if (!isActive(toBeFollowed) || !isActive(follower))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found");
+        if (!follower.getFollowing().contains(toBeFollowed))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Not following");
+        follower.removeFollowing(toBeFollowed);
+        userRepository.saveAndFlush(follower);
+        userRepository.saveAndFlush(toBeFollowed);
+    }
+
+    // Auxiliary functions
+
     private boolean existsUsername(String username) {
         return userRepository.findByCredentialUsername(username).size() > 0;
     }
@@ -60,8 +113,14 @@ public class UserServiceImpl implements UserService {
         return userList.get(0);
     }
 
-    // Checks whether a given username exists.
-    public Boolean validateUsername(String username) {
-        return _getUserByUsername(username) != null;
+    private User _setCredentialAndProfile (User user, UserRequestDto userRequestDto) {
+        user.setCredential(userRequestDto.getCredential());
+        user.setProfile(userRequestDto.getProfile());
+        return user;
     }
+
+    private boolean isActive(User user) {
+        return user != null && !user.isDeleted();
+    }
+
 }

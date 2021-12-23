@@ -9,7 +9,7 @@ import java.util.Set;
 
 @NoArgsConstructor
 @Data
-public class UserCreateDto {
+public class UserRequestDto {
     private Credential credential;
     private Profile profile;
 }
