@@ -27,8 +27,8 @@ public class UserController {
         return userMapper.entitiesToDtos(userRepository.findAll());
     }
 
-    // Checks whether a given username is available.
-    @GetMapping("/validate/username/available/@{username}")
+    // Checks whether a given username exists.
+    @GetMapping("/validate/username/exists/@{username}")
     public Boolean validateUsername(@PathVariable String username) {
         return userService.validateUsername(username);
     }
