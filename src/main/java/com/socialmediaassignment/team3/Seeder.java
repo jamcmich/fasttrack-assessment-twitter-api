@@ -1,6 +1,5 @@
 package com.socialmediaassignment.team3;
 
-import com.socialmediaassignment.team3.entities.Hashtag;
 import com.socialmediaassignment.team3.entities.Tweet;
 import com.socialmediaassignment.team3.entities.User;
 import com.socialmediaassignment.team3.entities.embeddable.Credential;
@@ -12,7 +11,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
-import java.lang.reflect.Array;
 import java.util.*;
 
 @Component
@@ -24,6 +22,10 @@ public class Seeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+        /*
+            Generators for less redundant code.
+         */
+
         // Generates random test users.
         Set<User> testUsers = new HashSet<>();
         for (int i = 0; i < 10; i++) {
@@ -35,7 +37,7 @@ public class Seeder implements CommandLineRunner {
             Profile profile = new Profile(
                     "test-firstname-" + i,
                     "test-lastname-" + i,
-                    "test-email-" + i +"@email.com",
+                    "test-email-" + i + "@email.com",
                     "123-456-78" + i
             );
 
@@ -79,5 +81,23 @@ public class Seeder implements CommandLineRunner {
             }
         }
         userRepository.saveAllAndFlush(tempFollowings);
+
+        /*
+            Custom test cases go here.
+         */
+        Set<User> customUsers = new HashSet<>();
+
+        // TEST: Return multiple followers.
+        User user1 = new User();
+        user1.setCredential(
+                new Credential(
+                        "multi-follower-user",
+                        "password")
+        );
+        user1.setFollowers(testUsers);
+        System.out.println(user1.getFollowers());
+        customUsers.add(user1);
+
+        userRepository.saveAllAndFlush(customUsers);
     }
 }

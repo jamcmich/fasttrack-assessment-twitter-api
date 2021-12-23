@@ -1,16 +1,15 @@
 package com.socialmediaassignment.team3.services.impl;
 
+import com.socialmediaassignment.team3.dtos.UserResponseDto;
 import com.socialmediaassignment.team3.entities.User;
 import com.socialmediaassignment.team3.mappers.UserMapper;
 import com.socialmediaassignment.team3.repositories.UserRepository;
 import com.socialmediaassignment.team3.services.UserService;
 import lombok.RequiredArgsConstructor;
+import org.apache.tomcat.util.json.JSONParser;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -35,22 +34,27 @@ public class UserServiceImpl implements UserService {
     }
 
     // Retrieves the followers of the user with the given username.
-    public Set<User> getFollowers(String username) throws Exception {
+    public List<User> getFollowers(String username) throws Exception {
         User user = userRepository.findByCredentialUsername(username);
+        System.out.println(user);
 
         if (user == null || user.isDeleted()) {
             throw new Exception("The requested username " + username + " does not exist!");
         }
         Set<User> followers = user.getFollowers();
+        System.out.println(followers);
 
-        Set<User> result = new HashSet<>();
+        List<User> result = new ArrayList<>();
         for (User follower : followers) {
-            // Determine active users.
-            if (!follower.isDeleted()) {
-                result.add(follower);
-            }
-            System.out.println("The user " + username + " is no longer active!");
+//            // Determine active users.
+//            if (!follower.isDeleted()) {
+//                result.add(follower);
+//            }
+//            System.out.println("The user " + username + " is no longer active!");
+            result.add(follower);
         }
+
+        System.out.println(result);
 
         return result;
     }

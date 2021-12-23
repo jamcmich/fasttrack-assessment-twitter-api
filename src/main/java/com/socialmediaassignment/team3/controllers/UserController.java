@@ -41,7 +41,7 @@ public class UserController {
 
     // Retrieves the followers of the user with the given username.
     @GetMapping("/@{username}/followers")
-    public User getFollowers(@PathVariable String username) throws Exception {
-        return userService.getUsername(username);
+    public List<User> getFollowers(@PathVariable String username) throws Exception {
+        return userService.getFollowers(username);
     }
 }
