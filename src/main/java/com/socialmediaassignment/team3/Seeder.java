@@ -71,8 +71,6 @@ public class Seeder implements CommandLineRunner {
         userRepository.saveAndFlush(s1);
         userRepository.saveAndFlush(s2);
 
-
-
         Hashtag hashtag = new Hashtag();
         hashtag.setLabel("some-hashtag-label");
         hashtag.setTweets(Set.of(tweet, tweet1));

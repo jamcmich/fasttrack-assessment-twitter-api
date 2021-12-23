@@ -14,7 +14,10 @@ public class HashtagServiceImpl implements HashtagService {
     private final HashtagMapper hashtagMapper;
     private final HashtagRepository hashtagRepository;
 
-    // Checks whether a given hashtag exists.
+    /*
+        GET validate/tag/exists/{label}
+        Checks whether a given hashtag exists.
+     */
     public Boolean validateHashtag(String label) {
         Hashtag hashtag = hashtagRepository.findByLabel(label);
 
