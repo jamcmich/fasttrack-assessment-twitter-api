@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import javax.persistence.Column;
 import javax.persistence.Embeddable;
 
 @Embeddable
@@ -13,6 +14,7 @@ import javax.persistence.Embeddable;
 @AllArgsConstructor
 public class Credential {
     @NotNull
+    @Column(unique = true)
     private String username;
 
     @NotNull
