@@ -2,18 +2,13 @@ package com.socialmediaassignment.team3.controllers;
 
 import com.socialmediaassignment.team3.dtos.UserCreateDto;
 import com.socialmediaassignment.team3.dtos.UserResponseDto;
-import com.socialmediaassignment.team3.mappers.UserMapper;
-import com.socialmediaassignment.team3.repositories.UserRepository;
 import com.socialmediaassignment.team3.services.UserService;
 import lombok.RequiredArgsConstructor;
-<<<<<<< HEAD
 import org.springframework.web.bind.annotation.*;
-=======
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
->>>>>>> a458223bea0a77de757914629001761ebecd1df2
 
 import java.util.List;
 
@@ -21,12 +16,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/users")
 public class UserController {
-<<<<<<< HEAD
-=======
-
-    private final UserRepository userRepository;
-    private final UserMapper userMapper;
->>>>>>> a458223bea0a77de757914629001761ebecd1df2
     private final UserService userService;
 
     @GetMapping
