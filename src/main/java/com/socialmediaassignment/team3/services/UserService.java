@@ -1,5 +1,6 @@
 package com.socialmediaassignment.team3.services;
 
+import com.socialmediaassignment.team3.dtos.TweetResponseDto;
 import com.socialmediaassignment.team3.dtos.UserResponseDto;
 import com.socialmediaassignment.team3.entities.User;
 
@@ -10,5 +11,7 @@ public interface UserService {
 
     User getUsername(String username) throws Exception;
 
-    List<User> getFollowers(String username) throws Exception;
+    List<UserResponseDto> getFollowers(String username) throws Exception;
+
+    List<TweetResponseDto> getUserTweets(String username) throws Exception;
 }

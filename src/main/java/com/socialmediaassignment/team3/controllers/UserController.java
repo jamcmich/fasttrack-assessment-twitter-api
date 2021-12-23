@@ -1,5 +1,6 @@
 package com.socialmediaassignment.team3.controllers;
 
+import com.socialmediaassignment.team3.dtos.TweetResponseDto;
 import com.socialmediaassignment.team3.dtos.UserResponseDto;
 import com.socialmediaassignment.team3.entities.User;
 import com.socialmediaassignment.team3.mappers.UserMapper;
@@ -41,7 +42,13 @@ public class UserController {
 
     // Retrieves the followers of the user with the given username.
     @GetMapping("/@{username}/followers")
-    public List<User> getFollowers(@PathVariable String username) throws Exception {
+    public List<UserResponseDto> getFollowers(@PathVariable String username) throws Exception {
         return userService.getFollowers(username);
+    }
+
+    // Retrieves all (non-deleted) tweets authored by the user with the given username.
+    @GetMapping("/@{username}/tweets")
+    public List<TweetResponseDto> getUserTweets(@PathVariable String username) throws Exception {
+        return userService.getUserTweets(username);
     }
 }

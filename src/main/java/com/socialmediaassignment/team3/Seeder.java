@@ -98,6 +98,27 @@ public class Seeder implements CommandLineRunner {
         System.out.println(user1.getFollowers());
         customUsers.add(user1);
 
+        // TEST: Return multiple tweets.
+        User user2 = new User();
+        user2.setCredential(
+                new Credential(
+                        "multi-tweet-user",
+                        "password")
+        );
+
+        Set<Tweet> tweetsList = new HashSet<Tweet>();
+        for (int i = 0; i < 3; i++) {
+            Tweet tweet = new Tweet();
+            tweet.setContent("some-tweet-" + i);
+            tweetsList.add(tweet);
+        }
+        user2.setTweets(tweetsList);
+
+        System.out.println(user2.getFollowers());
+        System.out.println(user2.getTweets());
+
+        customUsers.add(user2);
+
         userRepository.saveAllAndFlush(customUsers);
     }
 }
