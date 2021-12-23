@@ -29,26 +29,34 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponseDto createUser(UserCreateDto userCreateDto) {
-        User toSave = userMapper.createDtoToEntity(userCreateDto);
-        if (existsUsername(toSave.getCredential().getUsername())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username must be unique");
+        User user = _getUserByUsername(userCreateDto.getCredential().getUsername());
+        if (user == null)
+            user = userMapper.createDtoToEntity(userCreateDto);
+        else if (user.isDeleted()) {
+            user.setCredential(userCreateDto.getCredential());
+            user.setProfile(userCreateDto.getProfile());
         }
-        return userMapper.entityToDto(userRepository.saveAndFlush(toSave));
+        else
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username must be unique");
+        return userMapper.entityToDto(userRepository.saveAndFlush(user));
     }
 
     @Override
     public UserResponseDto getUserByUsername(String username) {
-        if (existsUsername(username)) {
-            return userMapper.entityToDto(_getUserByUsername(username));
-        }
-        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User with username '" + username + "' not found");
+        User user = _getUserByUsername(username);
+        if (user == null || user.isDeleted())
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User with username '" + username + "' not found");
+        return userMapper.entityToDto(user);
     }
 
     private boolean existsUsername(String username) {
         return userRepository.findByCredentialUsername(username).size() > 0;
     }
 
-    private User _getUserByUsername(String username) throws IndexOutOfBoundsException{
-        return userRepository.findByCredentialUsername(username).get(0);
+    private User _getUserByUsername(String username) {
+        List<User> userList = userRepository.findByCredentialUsername(username);
+        if (userList.size() == 0)
+            return null;
+        return userList.get(0);
     }
 }
