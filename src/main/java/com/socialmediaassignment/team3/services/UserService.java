@@ -20,4 +20,6 @@ public interface UserService {
     UserResponseDto deleteUser(String username, Credential credential);
 
     void followUser(String username, Credential credential);
+
+    void unFollowUser(String username, Credential credential);
 }

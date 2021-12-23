@@ -87,6 +87,19 @@ public class UserServiceImpl implements UserService {
         userRepository.saveAndFlush(toBeFollowed);
     }
 
+    @Override
+    public void unFollowUser(String username, Credential credential) {
+        User toBeFollowed = _getUserByUsername(username);
+        User follower = _getUserByUsername(credential.getUsername());
+        if (!isActive(toBeFollowed) || !isActive(follower))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found");
+        if (!follower.getFollowing().contains(toBeFollowed))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Not following");
+        follower.removeFollowing(toBeFollowed);
+        userRepository.saveAndFlush(follower);
+        userRepository.saveAndFlush(toBeFollowed);
+    }
+
     // Auxiliary functions
 
     private boolean existsUsername(String username) {
