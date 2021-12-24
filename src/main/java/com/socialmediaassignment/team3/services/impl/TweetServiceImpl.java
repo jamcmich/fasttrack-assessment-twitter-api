@@ -33,9 +33,6 @@ public class TweetServiceImpl implements TweetService {
     public List<TweetResponseDto> getUserTweets(String username) {
         User user = _getUserByUsername(username);
 
-        // test
-        System.out.println(user);
-
         if (!isActive(user))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found");
 
@@ -52,6 +49,36 @@ public class TweetServiceImpl implements TweetService {
         // test
         for (Tweet tweet : result) {
             System.out.println(tweet.getPosted());
+        }
+
+        return tweetMapper.entitiesToDtos(result);
+    }
+
+    /*
+        GET users/@{username}/mentions
+        Retrieves all (non-deleted) tweets in which the user with the given username is mentioned.
+    */
+    @Override
+    public List<TweetResponseDto> getTweetsByMention(String username) {
+        User user = _getUserByUsername(username);
+
+        if (!isActive(user))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found");
+
+        List<Tweet> tweets = tweetRepository.findAll();
+        System.out.println(tweets);
+
+        List<Tweet> result = new ArrayList<>();
+        for (Tweet tweet : tweets) {
+            if (!tweet.isDeleted() && tweet.getContent().contains("@" + username))
+                result.add(tweet);
+        }
+        result.sort(Comparator.comparing(Tweet::getPosted));
+        Collections.reverse(result); // sort list recent -> older
+
+        // test
+        for (Tweet tweet : result) {
+            System.out.println(tweet.getPosted() + ", " + tweet.getContent());
         }
 
         return tweetMapper.entitiesToDtos(result);

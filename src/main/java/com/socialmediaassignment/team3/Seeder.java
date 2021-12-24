@@ -79,6 +79,7 @@ public class Seeder implements CommandLineRunner {
         hashtagRepository.saveAndFlush(hashtag);
 
         Set<User> testUsers = new HashSet<>();
+        Set<Tweet> testTweets = new HashSet<>();
         for (int i = 0; i < 10; i++) {
             Credential credential = new Credential(
                     "test-username-" + i,
@@ -96,7 +97,16 @@ public class Seeder implements CommandLineRunner {
             user.setCredential(credential);
             user.setDeleted(new Random().nextBoolean());
             user.setProfile(profile);
+
             testUsers.add(userRepository.saveAndFlush(user));
+
+            Tweet t = new Tweet();
+            t.setContent("test to mention @angulo by " + user.getCredential().getUsername());
+            t.setAuthor(user);
+            t.setPosted(new Date());
+            t.setDeleted(new Random().nextBoolean());
+
+            testTweets.add(tweetRepository.saveAndFlush(t));
         }
 
         for (User user : testUsers) {

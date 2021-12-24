@@ -6,4 +6,6 @@ import java.util.List;
 
 public interface TweetService {
     List<TweetResponseDto> getUserTweets(String username);
+
+    List<TweetResponseDto> getTweetsByMention(String username);
 }

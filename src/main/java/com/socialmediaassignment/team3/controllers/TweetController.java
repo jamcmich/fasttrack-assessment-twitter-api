@@ -33,4 +33,13 @@ public class TweetController {
     public List<TweetResponseDto> getUserTweets(@PathVariable String username) {
         return tweetService.getUserTweets(username);
     }
+
+    /*
+        GET users/@{username}/mentions
+        Retrieves all (non-deleted) tweets in which the user with the given username is mentioned.
+    */
+    @GetMapping("/@{username}/mentions")
+    public List<TweetResponseDto> getTweetsByMention(@PathVariable String username) {
+        return tweetService.getTweetsByMention(username);
+    }
 }
