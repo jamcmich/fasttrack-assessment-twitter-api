@@ -84,6 +84,45 @@ public class TweetServiceImpl implements TweetService {
         return tweetMapper.entitiesToDtos(result);
     }
 
+    /*
+        GET users/@{username}/feed
+        Retrieves all (non-deleted) tweets authored by the user with the given username,
+        as well as all (non-deleted) tweets authored by users the given user is following.
+    */
+    @Override
+    public List<TweetResponseDto> getUserFeed(String username) {
+        // ISSUE: this is only getting the requested user's follower's non-deleted tweets, but not the requested user's tweets
+        User user = _getUserByUsername(username);
+
+        if (!isActive(user))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found");
+
+        List<Tweet> result = new ArrayList<>();
+        Set<User> following = user.getFollowing();
+
+        List<Tweet> tweets = tweetRepository.findAll();
+        for (Tweet tweet : tweets) {
+            // if the tweet's author's username == requested username
+            // OR if tweet's author is in the list of people that the requested user is following
+            if (!tweet.isDeleted()) {
+                if (tweet.getAuthor().getCredential().getUsername() == username || following.contains(tweet.getAuthor())) {
+                    result.add(tweet);
+                }
+            }
+        }
+        result.sort(Comparator.comparing(Tweet::getPosted));
+        Collections.reverse(result); // sort list recent -> older
+
+        for (Tweet r : result) {
+            System.out.println("AUTHOR: " + r.getAuthor());
+            System.out.println("FOLLOWING: " + r.getAuthor().getFollowing());
+            System.out.println("CONTENT: " + r.getContent());
+            System.out.println("DATE POSTED: " + r.getPosted());
+        }
+
+        return tweetMapper.entitiesToDtos(result);
+    }
+
     // Helper methods
     private User _getUserByUsername(String username) {
         List<User> userList = userRepository.findByCredentialUsername(username);

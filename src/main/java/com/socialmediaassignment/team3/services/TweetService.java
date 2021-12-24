@@ -8,4 +8,6 @@ public interface TweetService {
     List<TweetResponseDto> getUserTweets(String username);
 
     List<TweetResponseDto> getTweetsByMention(String username);
+
+    List<TweetResponseDto> getUserFeed(String username);
 }
