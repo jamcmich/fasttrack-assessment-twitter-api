@@ -91,7 +91,6 @@ public class TweetServiceImpl implements TweetService {
     */
     @Override
     public List<TweetResponseDto> getUserFeed(String username) {
-        // ISSUE: this is only getting the requested user's follower's non-deleted tweets, but not the requested user's tweets
         User user = _getUserByUsername(username);
 
         if (!isActive(user))
@@ -105,7 +104,7 @@ public class TweetServiceImpl implements TweetService {
             // if the tweet's author's username == requested username
             // OR if tweet's author is in the list of people that the requested user is following
             if (!tweet.isDeleted()) {
-                if (tweet.getAuthor().getCredential().getUsername() == username || following.contains(tweet.getAuthor())) {
+                if (Objects.equals(tweet.getAuthor().getCredential().getUsername(), username) || following.contains(tweet.getAuthor())) {
                     result.add(tweet);
                 }
             }
