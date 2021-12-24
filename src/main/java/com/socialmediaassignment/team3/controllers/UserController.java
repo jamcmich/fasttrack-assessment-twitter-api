@@ -2,6 +2,7 @@ package com.socialmediaassignment.team3.controllers;
 
 import com.socialmediaassignment.team3.dtos.UserRequestDto;
 import com.socialmediaassignment.team3.dtos.UserResponseDto;
+import com.socialmediaassignment.team3.entities.Tweet;
 import com.socialmediaassignment.team3.entities.embeddable.Credential;
 import com.socialmediaassignment.team3.services.UserService;
 import lombok.RequiredArgsConstructor;
@@ -100,7 +101,7 @@ public class UserController {
         Retrieves the followers of the user with the given username.
      */
     @GetMapping("/@{username}/followers")
-    public List<UserResponseDto> getFollowers(String username) {
+    public List<UserResponseDto> getFollowers(@PathVariable String username) {
         return userService.getFollowers(username);
     }
 }

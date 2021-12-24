@@ -24,4 +24,13 @@ public class TweetController {
     public List<TweetResponseDto> getAllTweets() {
         return tweetMapper.entitiesToDtos(tweetRepository.findAll());
     }
+
+    /*
+        GET users/@{username}/tweets
+        Retrieves all (non-deleted) tweets authored by the user with the given username.
+    */
+    @GetMapping("/@{username}/tweets")
+    public List<TweetResponseDto> getUserTweets(@PathVariable String username) {
+        return tweetService.getUserTweets(username);
+    }
 }

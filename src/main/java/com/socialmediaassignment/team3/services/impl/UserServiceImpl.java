@@ -141,8 +141,6 @@ public class UserServiceImpl implements UserService {
     @Override
     public List<UserResponseDto> getFollowers(String username) {
         User user = _getUserByUsername(username);
-        System.out.println("test");
-        System.out.println(user);
 
         if (!isActive(user))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found");
@@ -167,10 +165,6 @@ public class UserServiceImpl implements UserService {
         List<User> userList = userRepository.findByCredentialUsername(username);
         if (userList.size() == 0)
             return null;
-
-        // test
-        System.out.println(userList.get(0));
-
         return userList.get(0);
     }
 
