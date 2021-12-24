@@ -155,6 +155,27 @@ public class UserServiceImpl implements UserService {
         return userMapper.entitiesToDtos(result);
     }
 
+    /*
+        GET users/@{username}/following
+        Retrieves the users followed by the user with the given username.
+    */
+    @Override
+    public List<UserResponseDto> getFollowedUsers(String username) {
+        User user = _getUserByUsername(username);
+
+        if (!isActive(user))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found");
+
+        Set<User> following = user.getFollowing();
+
+        List<User> result = new ArrayList<>();
+        for (User follower : following) {
+            if (!follower.isDeleted())
+                result.add(follower);
+        }
+        return userMapper.entitiesToDtos(result);
+    }
+
     // Auxiliary functions
 
     private boolean existsUsername(String username) {

@@ -104,4 +104,13 @@ public class UserController {
     public List<UserResponseDto> getFollowers(@PathVariable String username) {
         return userService.getFollowers(username);
     }
+
+    /*
+        GET users/@{username}/following
+        Retrieves the users followed by the user with the given username.
+    */
+    @GetMapping("/@{username}/following")
+    public List<UserResponseDto> getFollowedUsers(@PathVariable String username) {
+        return userService.getFollowedUsers(username);
+    }
 }
