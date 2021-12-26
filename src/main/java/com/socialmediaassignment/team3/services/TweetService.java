@@ -1,5 +1,6 @@
 package com.socialmediaassignment.team3.services;
 
+import com.socialmediaassignment.team3.dtos.ContextResponseDto;
 import com.socialmediaassignment.team3.dtos.TweetRequestDto;
 import com.socialmediaassignment.team3.dtos.TweetResponseDto;
 import com.socialmediaassignment.team3.entities.embeddable.Credential;
@@ -14,4 +15,6 @@ public interface TweetService {
     TweetResponseDto createTweet(TweetRequestDto tweetRequestDto);
 
     void likeTweetById(Long id, Credential credential);
+
+    ContextResponseDto getContextForTweet(Long id);
 }

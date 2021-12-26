@@ -1,5 +1,6 @@
 package com.socialmediaassignment.team3.controllers;
 
+import com.socialmediaassignment.team3.dtos.ContextResponseDto;
 import com.socialmediaassignment.team3.dtos.TweetRequestDto;
 import com.socialmediaassignment.team3.dtos.TweetResponseDto;
 import com.socialmediaassignment.team3.entities.embeddable.Credential;
@@ -39,4 +40,8 @@ public class TweetController {
         tweetService.likeTweetById(id, credential);
     }
 
+    @GetMapping("/{id}/context")
+    public ContextResponseDto getContextForTweet(@PathVariable Long id) {
+        return tweetService.getContextForTweet(id);
+    }
 }

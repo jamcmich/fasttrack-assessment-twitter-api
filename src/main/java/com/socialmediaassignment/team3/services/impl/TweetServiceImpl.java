@@ -1,6 +1,7 @@
 package com.socialmediaassignment.team3.services.impl;
 
 
+import com.socialmediaassignment.team3.dtos.ContextResponseDto;
 import com.socialmediaassignment.team3.dtos.TweetRequestDto;
 import com.socialmediaassignment.team3.dtos.TweetResponseDto;
 import com.socialmediaassignment.team3.entities.Tweet;
@@ -15,8 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -64,6 +64,19 @@ public class TweetServiceImpl implements TweetService {
         userRepository.saveAndFlush(user);
     }
 
+    @Override
+    public ContextResponseDto getContextForTweet(Long id) {
+        Optional<Tweet> tweetOptional = tweetRepository.findById(id);
+        if (tweetOptional.isEmpty() || tweetOptional.get().isDeleted())
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tweet not found");
+        Tweet tweet = tweetOptional.get();
+        ContextResponseDto responseDto = new ContextResponseDto();
+        responseDto.setTarget(tweet);
+        responseDto.setBefore(_getTweetsBefore(tweet));
+        responseDto.setAfter(_getTweetsAfter(tweet));
+        return responseDto;
+    }
+
     private User _getUserByUsername(String username) {
         List<User> userList = userRepository.findByCredentialUsername(username);
         if (userList.size() == 0)
@@ -71,4 +84,28 @@ public class TweetServiceImpl implements TweetService {
         return userList.get(0);
     }
 
+    private List<Tweet> _getTweetsBefore(Tweet tweet) {
+        List<Tweet> tweetList = new ArrayList<>();
+        Tweet actualTweet = tweet;
+        while (actualTweet.getInReplyTo() != null) {
+            actualTweet = actualTweet.getInReplyTo();
+            if (!actualTweet.isDeleted())
+                tweetList.add(actualTweet);
+        }
+        return tweetList;
+    }
+
+    private List<Tweet> _getTweetsAfter(Tweet tweet) {
+        List<Tweet> tweetList = new ArrayList<>();
+        Queue<Tweet> tweetQueue = new LinkedList<>();
+        tweetQueue.addAll(tweet.getReplies());
+
+        while (tweetQueue.size() > 0) {
+            Tweet actualTweet = tweetQueue.poll();
+            if (!actualTweet.isDeleted())
+                tweetList.add(actualTweet);
+            tweetQueue.addAll(actualTweet.getReplies());
+        }
+        return tweetList;
+    }
 }
