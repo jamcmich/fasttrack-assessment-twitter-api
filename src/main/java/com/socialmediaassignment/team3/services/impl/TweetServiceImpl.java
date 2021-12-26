@@ -85,6 +85,25 @@ public class TweetServiceImpl implements TweetService {
         return tweetMapper.entityToDto(tweetRepository.saveAndFlush(repostTweet));
     }
 
+    @Override
+    public List<TweetResponseDto> getRepostOfTweetById(Long id) {
+        Tweet tweet = _getActiveTweetById(id);
+        return tweetMapper.entitiesToDtos(tweet.getReposts().stream().collect(Collectors.toList()));
+    }
+
+    @Override
+    public TweetResponseDto replyTweetById(Long id, TweetRequestDto tweetRequestDto) {
+        Tweet tweetToReply = _getActiveTweetById(id);
+        User author = _authorizeCredential(tweetRequestDto.getCredentials());
+
+        Tweet tweet = new Tweet();
+        tweet.setInReplyTo(tweetToReply);
+        tweet.setContent(tweetRequestDto.getContent());
+        tweet.setAuthor(author);
+        return tweetMapper.entityToDto(tweetRepository.saveAndFlush(tweet));
+    }
+
+
     private User _authorizeCredential(Credential credential) {
         Optional<User> userOptional = userRepository.findOneByCredential(credential);
         if (userOptional.isEmpty() || userOptional.get().isDeleted())
