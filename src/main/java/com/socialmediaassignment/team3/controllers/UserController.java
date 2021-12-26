@@ -55,10 +55,4 @@ public class UserController {
     public void unFollowUser(@PathVariable String username, @RequestBody Credential credential) {
         userService.unFollowUser(username, credential);
     }
-
-    // Checks whether a given username exists.
-    @GetMapping("/validate/username/exists/@{username}")
-    public Boolean validateUsername(@PathVariable String username) {
-        return userService.validateUsername(username);
-    }
 }

@@ -24,13 +24,6 @@ public class HashtagServiceImpl implements HashtagService {
     private final HashtagRepository hashtagRepository;
     private final TweetMapper tweetMapper;
 
-    // Checks whether a given hashtag exists.
-    public Boolean validateHashtag(String label) {
-        Optional<Hashtag> hashtagOptional = hashtagRepository.findByLabel(label);
-
-        return hashtagOptional.isPresent();
-    }
-
     @Override
     public List<HashtagResponseDto> getAllHashtags() {
         return hashtagMapper.entitiesToDtos(hashtagRepository.findAll());

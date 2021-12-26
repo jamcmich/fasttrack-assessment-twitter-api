@@ -13,8 +13,6 @@ public interface UserService {
 
     UserResponseDto getUserByUsername(String username);
 
-    Boolean validateUsername(String username);
-
     UserResponseDto updateUser(String username, UserRequestDto userRequestDto);
 
     UserResponseDto deleteUser(String username, Credential credential);

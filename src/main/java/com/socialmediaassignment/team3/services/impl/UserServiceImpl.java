@@ -50,12 +50,6 @@ public class UserServiceImpl implements UserService {
         return userMapper.entityToDto(user);
     }
 
-    // Checks whether a given username exists.
-    @Override
-    public Boolean validateUsername(String username) {
-        return _getUserByUsername(username) != null;
-    }
-
     @Override
     public UserResponseDto updateUser(String username, UserRequestDto userRequestDto) {
         User toUpdate = _authorizeCredential(userRequestDto.getCredential());
