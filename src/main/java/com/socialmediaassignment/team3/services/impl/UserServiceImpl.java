@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -49,17 +50,10 @@ public class UserServiceImpl implements UserService {
         return userMapper.entityToDto(user);
     }
 
-    // Checks whether a given username exists.
-    @Override
-    public Boolean validateUsername(String username) {
-        return _getUserByUsername(username) != null;
-    }
-
     @Override
     public UserResponseDto updateUser(String username, UserRequestDto userRequestDto) {
-        User toUpdate = _getUserByUsername(username);
-        if (toUpdate == null || toUpdate.isDeleted())
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User does not exist");
+        User toUpdate = _authorizeCredential(userRequestDto.getCredential());
+
         toUpdate = _setCredentialAndProfile(toUpdate, userRequestDto);
         toUpdate.getCredential().setUsername(username);
         return userMapper.entityToDto(userRepository.saveAndFlush(toUpdate));
@@ -67,9 +61,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserResponseDto deleteUser(String username, Credential credential) {
-        User toDelete = _getUserByUsername(username);
-        if (toDelete == null || toDelete.isDeleted())
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User does not exist");
+        User toDelete = _authorizeCredential(credential);
         toDelete.setDeleted(true);
         return userMapper.entityToDto(userRepository.saveAndFlush(toDelete));
     }
@@ -77,8 +69,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public void followUser(String username, Credential credential) {
         User toBeFollowed = _getUserByUsername(username);
-        User follower = _getUserByUsername(credential.getUsername());
-        if (!isActive(toBeFollowed) || !isActive(follower))
+        User follower = _authorizeCredential(credential);
+        if (!isActive(toBeFollowed))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found");
         if (follower.getFollowing().contains(toBeFollowed))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Already following");
@@ -90,8 +82,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public void unFollowUser(String username, Credential credential) {
         User toBeFollowed = _getUserByUsername(username);
-        User follower = _getUserByUsername(credential.getUsername());
-        if (!isActive(toBeFollowed) || !isActive(follower))
+        User follower = _authorizeCredential(credential);
+        if (!isActive(toBeFollowed))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found");
         if (!follower.getFollowing().contains(toBeFollowed))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Not following");
@@ -101,22 +93,24 @@ public class UserServiceImpl implements UserService {
     }
 
     // Auxiliary functions
-
-    private boolean existsUsername(String username) {
-        return userRepository.findByCredentialUsername(username).size() > 0;
-    }
-
     private User _getUserByUsername(String username) {
-        List<User> userList = userRepository.findByCredentialUsername(username);
-        if (userList.size() == 0)
+        Optional<User> userOptional = userRepository.findByCredentialUsername(username);
+        if (userOptional.isEmpty())
             return null;
-        return userList.get(0);
+        return userOptional.get();
     }
 
     private User _setCredentialAndProfile (User user, UserRequestDto userRequestDto) {
         user.setCredential(userRequestDto.getCredential());
         user.setProfile(userRequestDto.getProfile());
         return user;
+    }
+
+    private User _authorizeCredential(Credential credential) {
+        Optional<User> userOptional = userRepository.findOneByCredential(credential);
+        if (userOptional.isEmpty() || userOptional.get().isDeleted())
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Bad credentials");
+        return userOptional.get();
     }
 
     private boolean isActive(User user) {

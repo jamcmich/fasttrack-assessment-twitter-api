@@ -1,6 +1,7 @@
 package com.socialmediaassignment.team3.controllers;
 
 import com.socialmediaassignment.team3.dtos.HashtagResponseDto;
+import com.socialmediaassignment.team3.dtos.TweetResponseDto;
 import com.socialmediaassignment.team3.mappers.HashtagMapper;
 import com.socialmediaassignment.team3.repositories.HashtagRepository;
 import com.socialmediaassignment.team3.services.HashtagService;
@@ -14,7 +15,7 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/hashtag")
+@RequestMapping("/tags")
 public class HashtagController {
     private final HashtagRepository hashtagRepository;
     private final HashtagMapper hashtagMapper;
@@ -22,12 +23,11 @@ public class HashtagController {
 
     @GetMapping
     public List<HashtagResponseDto> getAllHashtags() {
-        return hashtagMapper.entitiesToDtos(hashtagRepository.findAll());
+        return hashtagService.getAllHashtags();
     }
 
-    // Checks whether a given hashtag exists.
-    @GetMapping("/validate/tag/exists/{label}")
-    public Boolean validateHashtag(@PathVariable String label) {
-        return hashtagService.validateHashtag(label);
+    @GetMapping("/{label}")
+    public List<TweetResponseDto> getTweetByTag(@PathVariable String label) {
+        return hashtagService.getTweetByTag(label);
     }
 }
