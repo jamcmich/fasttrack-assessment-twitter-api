@@ -103,6 +103,12 @@ public class TweetServiceImpl implements TweetService {
         return tweetMapper.entityToDto(tweetRepository.saveAndFlush(tweet));
     }
 
+    @Override
+    public List<TweetResponseDto> getRepliesToTweetById(Long id) {
+        Tweet tweet = _getActiveTweetById(id);
+        return tweetMapper.entitiesToDtos(tweet.getReplies().stream().filter(t -> !t.isDeleted()).collect(Collectors.toList()));
+    }
+
 
     private User _authorizeCredential(Credential credential) {
         Optional<User> userOptional = userRepository.findOneByCredential(credential);
