@@ -52,6 +52,7 @@ public class TweetController {
     }
 
     @PostMapping("/{id}/repost")
+    @ResponseStatus(HttpStatus.CREATED)
     public TweetResponseDto repostTweetById(@PathVariable Long id, @RequestBody Credential credential) {
         return tweetService.repostTweetById(id, credential);
     }
@@ -62,6 +63,7 @@ public class TweetController {
     }
 
     @PostMapping("/{id}/reply")
+    @ResponseStatus(HttpStatus.CREATED)
     public TweetResponseDto replyTweetById(@PathVariable Long id, @RequestBody TweetRequestDto tweetRequestDto) {
         return tweetService.replyTweetById(id, tweetRequestDto);
     }
