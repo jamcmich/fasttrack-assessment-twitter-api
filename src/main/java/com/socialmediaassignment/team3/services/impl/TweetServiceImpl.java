@@ -171,11 +171,13 @@ public class TweetServiceImpl implements TweetService {
         List<String> tagLabels = _getMatches(content, "#");
 
         for (String tagLabel : tagLabels) {
-            Hashtag hashtag = hashtagRepository.findByLabel(tagLabel);
-            if (hashtag == null) {
+            Optional<Hashtag> hashtagOptional = hashtagRepository.findByLabel(tagLabel);
+            Hashtag hashtag;
+            if (hashtagOptional.isEmpty()) {
                 hashtag = new Hashtag();
                 hashtag.setLabel(tagLabel);
-
+            } else {
+                hashtag = hashtagOptional.get();
             }
             hashtag.setLastUsed(new Date(System.currentTimeMillis()));
             hashtag = hashtagRepository.saveAndFlush(hashtag);
