@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -103,14 +104,14 @@ public class UserServiceImpl implements UserService {
     // Auxiliary functions
 
     private boolean existsUsername(String username) {
-        return userRepository.findByCredentialUsername(username).size() > 0;
+        return userRepository.findByCredentialUsername(username).isPresent();
     }
 
     private User _getUserByUsername(String username) {
-        List<User> userList = userRepository.findByCredentialUsername(username);
-        if (userList.size() == 0)
+        Optional<User> userOptional = userRepository.findByCredentialUsername(username);
+        if (userOptional.isEmpty())
             return null;
-        return userList.get(0);
+        return userOptional.get();
     }
 
     private User _setCredentialAndProfile (User user, UserRequestDto userRequestDto) {

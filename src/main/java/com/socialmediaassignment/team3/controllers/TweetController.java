@@ -3,6 +3,7 @@ package com.socialmediaassignment.team3.controllers;
 import com.socialmediaassignment.team3.dtos.ContextResponseDto;
 import com.socialmediaassignment.team3.dtos.TweetRequestDto;
 import com.socialmediaassignment.team3.dtos.TweetResponseDto;
+import com.socialmediaassignment.team3.dtos.UserResponseDto;
 import com.socialmediaassignment.team3.entities.embeddable.Credential;
 import com.socialmediaassignment.team3.mappers.TweetMapper;
 import com.socialmediaassignment.team3.repositories.TweetRepository;
@@ -68,5 +69,10 @@ public class TweetController {
     @GetMapping("/{id}/replies")
     public List<TweetResponseDto> getReplyToTweetById(@PathVariable Long id) {
         return tweetService.getRepliesToTweetById(id);
+    }
+
+    @GetMapping("/{id}/mentions")
+    public List<UserResponseDto> getMentionInTweetById(@PathVariable Long id) {
+        return tweetService.getMentionInTweetById(id);
     }
 }

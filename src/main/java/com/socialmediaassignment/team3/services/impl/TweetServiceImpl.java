@@ -4,10 +4,14 @@ package com.socialmediaassignment.team3.services.impl;
 import com.socialmediaassignment.team3.dtos.ContextResponseDto;
 import com.socialmediaassignment.team3.dtos.TweetRequestDto;
 import com.socialmediaassignment.team3.dtos.TweetResponseDto;
+import com.socialmediaassignment.team3.dtos.UserResponseDto;
+import com.socialmediaassignment.team3.entities.Hashtag;
 import com.socialmediaassignment.team3.entities.Tweet;
 import com.socialmediaassignment.team3.entities.User;
 import com.socialmediaassignment.team3.entities.embeddable.Credential;
 import com.socialmediaassignment.team3.mappers.TweetMapper;
+import com.socialmediaassignment.team3.mappers.UserMapper;
+import com.socialmediaassignment.team3.repositories.HashtagRepository;
 import com.socialmediaassignment.team3.repositories.TweetRepository;
 import com.socialmediaassignment.team3.repositories.UserRepository;
 import com.socialmediaassignment.team3.services.TweetService;
@@ -16,6 +20,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -25,7 +30,9 @@ public class TweetServiceImpl implements TweetService {
 
     private final TweetMapper tweetMapper;
     private final TweetRepository tweetRepository;
+    private final UserMapper userMapper;
     private final UserRepository userRepository;
+    private final HashtagRepository hashtagRepository;
 
     @Override
     public List<TweetResponseDto> getActiveTweets() {
@@ -43,6 +50,7 @@ public class TweetServiceImpl implements TweetService {
         Tweet tweet = new Tweet();
         tweet.setAuthor(author);
         tweet.setContent(tweetRequestDto.getContent());
+        _processTweetContent(tweet);
         return tweetMapper.entityToDto(tweetRepository.saveAndFlush(tweet));
     }
 
@@ -100,6 +108,7 @@ public class TweetServiceImpl implements TweetService {
         tweet.setInReplyTo(tweetToReply);
         tweet.setContent(tweetRequestDto.getContent());
         tweet.setAuthor(author);
+        _processTweetContent(tweet);
         return tweetMapper.entityToDto(tweetRepository.saveAndFlush(tweet));
     }
 
@@ -107,6 +116,12 @@ public class TweetServiceImpl implements TweetService {
     public List<TweetResponseDto> getRepliesToTweetById(Long id) {
         Tweet tweet = _getActiveTweetById(id);
         return tweetMapper.entitiesToDtos(tweet.getReplies().stream().filter(t -> !t.isDeleted()).collect(Collectors.toList()));
+    }
+
+    @Override
+    public List<UserResponseDto> getMentionInTweetById(Long id) {
+        Tweet tweet = _getActiveTweetById(id);
+        return userMapper.entitiesToDtos(tweet.getUsersMentioned().stream().filter(u -> !u.isDeleted()).collect(Collectors.toList()));
     }
 
 
@@ -147,5 +162,57 @@ public class TweetServiceImpl implements TweetService {
             tweetQueue.addAll(actualTweet.getReplies());
         }
         return tweetList;
+    }
+
+    private void _processTweetContent (Tweet tweet) {
+        String content = tweet.getContent();
+
+        List<String> mentions = _getMatches(content, "@");
+        List<String> tagLabels = _getMatches(content, "#");
+
+        for (String tagLabel : tagLabels) {
+            Hashtag hashtag = hashtagRepository.findByLabel(tagLabel);
+            if (hashtag == null) {
+                hashtag = new Hashtag();
+                hashtag.setLabel(tagLabel);
+
+            }
+            hashtag.setLastUsed(new Date(System.currentTimeMillis()));
+            hashtag = hashtagRepository.saveAndFlush(hashtag);
+            tweet.addHashtag(hashtag);
+        }
+
+        for (String username : mentions) {
+            User user = _getUserByUsername(username);
+            if (user == null)
+                continue;
+            tweet.addMentionedUser(user);
+        }
+    }
+
+    private List<String> _getMatches(String text, String matchBegin) {
+        Set<Character> specialChars = Set.of('@', ' ', '#');
+
+        int pointer = 0;
+        List<String> matchList = new ArrayList<>();
+
+        while (text.indexOf(matchBegin, pointer) >= 0) {
+            pointer = text.indexOf(matchBegin, pointer);
+            String username = "";
+            int auxPointer = pointer + 1;
+            while (auxPointer < text.length() && !specialChars.contains(text.charAt(auxPointer)))
+                username = username + text.charAt(auxPointer++);
+            matchList.add(username);
+            pointer = auxPointer;
+        }
+
+        return  matchList;
+    }
+
+    private User _getUserByUsername(String username) {
+        Optional<User> userOptional = userRepository.findByCredentialUsername(username);
+        if (userOptional.isEmpty())
+            return null;
+        return userOptional.get();
     }
 }
