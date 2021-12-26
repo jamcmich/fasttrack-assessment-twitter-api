@@ -10,4 +10,6 @@ public interface TweetService {
     List<TweetResponseDto> getTweetsByMention(String username);
 
     List<TweetResponseDto> getUserFeed(String username);
+
+    List<TweetResponseDto> getTweetContext(Long id);
 }

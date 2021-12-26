@@ -52,4 +52,16 @@ public class TweetController {
     public List<TweetResponseDto> getUserFeed(@PathVariable String username) {
         return tweetService.getUserFeed(username);
     }
+
+    /*
+        GET tweets/{id}/context
+        Retrieves the context of the tweet with the given id.
+        If that tweet is deleted or otherwise doesn't exist,
+        an error should be sent in lieu of a response.
+    */
+    // TODO: Implement getTweetContext() method
+    @GetMapping("/{id}/context")
+    public List<TweetResponseDto> getTweetContext(@PathVariable Long id) {
+        return tweetService.getTweetContext(id);
+    }
 }

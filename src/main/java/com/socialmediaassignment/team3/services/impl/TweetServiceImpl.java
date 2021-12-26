@@ -122,6 +122,18 @@ public class TweetServiceImpl implements TweetService {
         return tweetMapper.entitiesToDtos(result);
     }
 
+    /*
+        GET tweets/{id}/context
+        Retrieves the context of the tweet with the given id.
+        If that tweet is deleted or otherwise doesn't exist,
+        an error should be sent in lieu of a response.
+    */
+    // TODO: Implement getTweetContext() method
+    @Override
+    public List<TweetResponseDto> getTweetContext(Long id) {
+        return null;
+    }
+
     // Helper methods
     private User _getUserByUsername(String username) {
         List<User> userList = userRepository.findByCredentialUsername(username);
