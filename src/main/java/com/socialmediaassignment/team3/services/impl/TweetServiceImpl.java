@@ -34,17 +34,12 @@ public class TweetServiceImpl implements TweetService {
 
     @Override
     public TweetResponseDto getTweetById(Long id) {
-        Optional<Tweet> tweetOptional = tweetRepository.findById(id);
-        if (tweetOptional.isEmpty())
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Tweet not found");
-        return tweetMapper.entityToDto(tweetOptional.get());
+        return tweetMapper.entityToDto(_getActiveTweetById(id));
     }
 
     @Override
     public TweetResponseDto createTweet(TweetRequestDto tweetRequestDto) {
-        User author = _getUserByUsername(tweetRequestDto.getCredentials().getUsername());
-        if (author == null || author.isDeleted())
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User does not exist");
+        User author = _authorizeCredential(tweetRequestDto.getCredentials());
         Tweet tweet = new Tweet();
         tweet.setAuthor(author);
         tweet.setContent(tweetRequestDto.getContent());
@@ -53,23 +48,15 @@ public class TweetServiceImpl implements TweetService {
 
     @Override
     public void likeTweetById(Long id, Credential credential) {
-        User user = _getUserByUsername(credential.getUsername());
-        if (user == null || user.isDeleted())
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User does not exist");
-        Optional<Tweet> tweetOptional = tweetRepository.findById(id);
-        if (tweetOptional.isEmpty())
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Tweet not found");
-        Tweet tweet = tweetOptional.get();
+        User user = _authorizeCredential(credential);
+        Tweet tweet = _getActiveTweetById(id);
         user.addLikedTweet(tweet);
         userRepository.saveAndFlush(user);
     }
 
     @Override
     public ContextResponseDto getContextForTweet(Long id) {
-        Optional<Tweet> tweetOptional = tweetRepository.findById(id);
-        if (tweetOptional.isEmpty() || tweetOptional.get().isDeleted())
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tweet not found");
-        Tweet tweet = tweetOptional.get();
+        Tweet tweet = _getActiveTweetById(id);
         ContextResponseDto responseDto = new ContextResponseDto();
         responseDto.setTarget(tweet);
         responseDto.setBefore(_getTweetsBefore(tweet));
@@ -79,24 +66,37 @@ public class TweetServiceImpl implements TweetService {
 
     @Override
     public TweetResponseDto deleteTweetById(Long id, Credential credential) {
-        Optional<Tweet> tweetOptional = tweetRepository.findById(id);
-        if (tweetOptional.isEmpty() || tweetOptional.get().isDeleted())
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tweet not found");
-
-        Tweet tweet = tweetOptional.get();
-        User user = _getUserByUsername(credential.getUsername());
-        if (user == null || tweet.getAuthor() != user)
+        Tweet tweet = _getActiveTweetById(id);
+        User user = _authorizeCredential(credential);
+        if (user != tweet.getAuthor())
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Bad credentials");
         tweet.setDeleted(true);
 
         return tweetMapper.entityToDto(tweetRepository.saveAndFlush(tweet));
     }
 
-    private User _getUserByUsername(String username) {
-        List<User> userList = userRepository.findByCredentialUsername(username);
-        if (userList.size() == 0)
-            return null;
-        return userList.get(0);
+    @Override
+    public TweetResponseDto repostTweetById(Long id, Credential credential) {
+        User user = _authorizeCredential(credential);
+        Tweet originalTweet = _getActiveTweetById(id);
+        Tweet repostTweet = new Tweet();
+        repostTweet.setAuthor(user);
+        repostTweet.setRepostOf(originalTweet);
+        return tweetMapper.entityToDto(tweetRepository.saveAndFlush(repostTweet));
+    }
+
+    private User _authorizeCredential(Credential credential) {
+        Optional<User> userOptional = userRepository.findOneByCredential(credential);
+        if (userOptional.isEmpty() || userOptional.get().isDeleted())
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Bad credentials");
+        return userOptional.get();
+    }
+
+    private Tweet _getActiveTweetById(Long id) {
+        Optional<Tweet> tweetOptional = tweetRepository.findById(id);
+        if (tweetOptional.isEmpty() || tweetOptional.get().isDeleted())
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tweet not found");
+        return tweetOptional.get();
     }
 
     private List<Tweet> _getTweetsBefore(Tweet tweet) {

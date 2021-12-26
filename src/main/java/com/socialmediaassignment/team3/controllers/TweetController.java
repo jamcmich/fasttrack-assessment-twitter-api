@@ -49,4 +49,9 @@ public class TweetController {
     public TweetResponseDto deleteTweetById(@PathVariable Long id, @RequestBody Credential credential) {
         return tweetService.deleteTweetById(id, credential);
     }
+
+    @PostMapping("/{id}/repost")
+    public TweetResponseDto repostTweetById(@PathVariable Long id, @RequestBody Credential credential) {
+        return tweetService.repostTweetById(id, credential);
+    }
 }
