@@ -44,4 +44,9 @@ public class TweetController {
     public ContextResponseDto getContextForTweet(@PathVariable Long id) {
         return tweetService.getContextForTweet(id);
     }
+
+    @DeleteMapping("/{id}")
+    public TweetResponseDto deleteTweetById(@PathVariable Long id, @RequestBody Credential credential) {
+        return tweetService.deleteTweetById(id, credential);
+    }
 }

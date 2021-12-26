@@ -17,4 +17,6 @@ public interface TweetService {
     void likeTweetById(Long id, Credential credential);
 
     ContextResponseDto getContextForTweet(Long id);
+
+    TweetResponseDto deleteTweetById(Long id, Credential credential);
 }

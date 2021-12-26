@@ -77,6 +77,21 @@ public class TweetServiceImpl implements TweetService {
         return responseDto;
     }
 
+    @Override
+    public TweetResponseDto deleteTweetById(Long id, Credential credential) {
+        Optional<Tweet> tweetOptional = tweetRepository.findById(id);
+        if (tweetOptional.isEmpty() || tweetOptional.get().isDeleted())
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tweet not found");
+
+        Tweet tweet = tweetOptional.get();
+        User user = _getUserByUsername(credential.getUsername());
+        if (user == null || tweet.getAuthor() != user)
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Bad credentials");
+        tweet.setDeleted(true);
+
+        return tweetMapper.entityToDto(tweetRepository.saveAndFlush(tweet));
+    }
+
     private User _getUserByUsername(String username) {
         List<User> userList = userRepository.findByCredentialUsername(username);
         if (userList.size() == 0)
