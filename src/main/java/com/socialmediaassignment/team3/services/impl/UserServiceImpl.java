@@ -4,13 +4,14 @@ import com.socialmediaassignment.team3.dtos.UserRequestDto;
 import com.socialmediaassignment.team3.dtos.UserResponseDto;
 import com.socialmediaassignment.team3.entities.User;
 import com.socialmediaassignment.team3.entities.embeddable.Credential;
+import com.socialmediaassignment.team3.exceptions.BadRequestException;
+import com.socialmediaassignment.team3.exceptions.NotFoundException;
+import com.socialmediaassignment.team3.exceptions.UnauthorizedException;
 import com.socialmediaassignment.team3.mappers.UserMapper;
 import com.socialmediaassignment.team3.repositories.UserRepository;
 import com.socialmediaassignment.team3.services.UserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -38,7 +39,7 @@ public class UserServiceImpl implements UserService {
             user = _setCredentialAndProfile(user, userRequestDto);
         }
         else
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Username must be unique");
+            throw new BadRequestException("Username must be unique");
         return userMapper.entityToDto(userRepository.saveAndFlush(user));
     }
 
@@ -46,7 +47,7 @@ public class UserServiceImpl implements UserService {
     public UserResponseDto getUserByUsername(String username) {
         User user = _getUserByUsername(username);
         if (user == null || user.isDeleted())
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "User with username '" + username + "' not found");
+            throw new NotFoundException("User with username '" + username + "' not found");
         return userMapper.entityToDto(user);
     }
 
@@ -71,9 +72,9 @@ public class UserServiceImpl implements UserService {
         User toBeFollowed = _getUserByUsername(username);
         User follower = _authorizeCredential(credential);
         if (!isActive(toBeFollowed))
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found");
+            throw new BadRequestException("User not found");
         if (follower.getFollowing().contains(toBeFollowed))
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Already following");
+            throw new BadRequestException("Already following");
         follower.addFollowing(toBeFollowed);
         userRepository.saveAndFlush(follower);
         userRepository.saveAndFlush(toBeFollowed);
@@ -81,15 +82,15 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public void unFollowUser(String username, Credential credential) {
-        User toBeFollowed = _getUserByUsername(username);
+        User toBeUnfollowed = _getUserByUsername(username);
         User follower = _authorizeCredential(credential);
-        if (!isActive(toBeFollowed))
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found");
-        if (!follower.getFollowing().contains(toBeFollowed))
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Not following");
-        follower.removeFollowing(toBeFollowed);
+        if (!isActive(toBeUnfollowed))
+            throw new BadRequestException("User not found");
+        if (!follower.getFollowing().contains(toBeUnfollowed))
+            throw new BadRequestException("Not following");
+        follower.removeFollowing(toBeUnfollowed);
         userRepository.saveAndFlush(follower);
-        userRepository.saveAndFlush(toBeFollowed);
+        userRepository.saveAndFlush(toBeUnfollowed);
     }
 
     // Auxiliary functions
@@ -109,7 +110,7 @@ public class UserServiceImpl implements UserService {
     private User _authorizeCredential(Credential credential) {
         Optional<User> userOptional = userRepository.findOneByCredential(credential);
         if (userOptional.isEmpty() || userOptional.get().isDeleted())
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Bad credentials");
+            throw new UnauthorizedException("Bad credentials");
         return userOptional.get();
     }
 

@@ -9,6 +9,8 @@ import com.socialmediaassignment.team3.entities.Hashtag;
 import com.socialmediaassignment.team3.entities.Tweet;
 import com.socialmediaassignment.team3.entities.User;
 import com.socialmediaassignment.team3.entities.embeddable.Credential;
+import com.socialmediaassignment.team3.exceptions.BadRequestException;
+import com.socialmediaassignment.team3.exceptions.UnauthorizedException;
 import com.socialmediaassignment.team3.mappers.TweetMapper;
 import com.socialmediaassignment.team3.mappers.UserMapper;
 import com.socialmediaassignment.team3.repositories.HashtagRepository;
@@ -21,6 +23,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.stream.Collectors;
+
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -77,7 +82,7 @@ public class TweetServiceImpl implements TweetService {
         Tweet tweet = _getActiveTweetById(id);
         User user = _authorizeCredential(credential);
         if (user != tweet.getAuthor())
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Bad credentials");
+            throw new UnauthorizedException("Bad credentials");
         tweet.setDeleted(true);
 
         return tweetMapper.entityToDto(tweetRepository.saveAndFlush(tweet));
@@ -128,14 +133,14 @@ public class TweetServiceImpl implements TweetService {
     private User _authorizeCredential(Credential credential) {
         Optional<User> userOptional = userRepository.findOneByCredential(credential);
         if (userOptional.isEmpty() || userOptional.get().isDeleted())
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Bad credentials");
+            throw new UnauthorizedException("Bad credentials");
         return userOptional.get();
     }
 
     private Tweet _getActiveTweetById(Long id) {
         Optional<Tweet> tweetOptional = tweetRepository.findById(id);
         if (tweetOptional.isEmpty() || tweetOptional.get().isDeleted())
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tweet not found");
+            throw new BadRequestException("Tweet not found");
         return tweetOptional.get();
     }
 

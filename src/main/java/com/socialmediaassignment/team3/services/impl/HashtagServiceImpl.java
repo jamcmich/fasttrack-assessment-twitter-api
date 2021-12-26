@@ -3,6 +3,7 @@ package com.socialmediaassignment.team3.services.impl;
 import com.socialmediaassignment.team3.dtos.HashtagResponseDto;
 import com.socialmediaassignment.team3.dtos.TweetResponseDto;
 import com.socialmediaassignment.team3.entities.Hashtag;
+import com.socialmediaassignment.team3.exceptions.BadRequestException;
 import com.socialmediaassignment.team3.mappers.HashtagMapper;
 import com.socialmediaassignment.team3.mappers.TweetMapper;
 import com.socialmediaassignment.team3.repositories.HashtagRepository;
@@ -11,6 +12,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,7 +38,7 @@ public class HashtagServiceImpl implements HashtagService {
     public List<TweetResponseDto> getTweetByTag(String label) {
         Optional<Hashtag> hashtagOptional = hashtagRepository.findByLabel(label);
         if (hashtagOptional.isEmpty())
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid label");
+            throw new BadRequestException("Invalid label");
         return tweetMapper.entitiesToDtos(hashtagOptional.get().getTweets().stream().filter(t -> !t.isDeleted()).collect(Collectors.toList()));
     }
 }
