@@ -99,11 +99,6 @@ public class UserServiceImpl implements UserService {
     }
 
     // Auxiliary functions
-
-    private boolean existsUsername(String username) {
-        return userRepository.findByCredentialUsername(username).isPresent();
-    }
-
     private User _getUserByUsername(String username) {
         Optional<User> userOptional = userRepository.findByCredentialUsername(username);
         if (userOptional.isEmpty())
