@@ -22,11 +22,13 @@ public class Tweet {
     @GeneratedValue
     private Long id;
 
+    // TODO: 'author' is not a required property. Remove @NotNull annotation.
     @ManyToOne
     @JoinColumn(name = "author_id")
     @NotNull
     private User author;
 
+    // TODO: Required property. Add @NotNull annotation.
     @ManyToMany(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
     @JoinTable(name = "tweet_hashtag_mapping",
             joinColumns = {@JoinColumn(name = "hashtag_id")},
@@ -34,12 +36,15 @@ public class Tweet {
     )
     private Set<Hashtag> hashtags = new HashSet<>();
 
+    // TODO: Required property. Add @NotNull annotation.
     @ManyToMany(mappedBy = "mentions")
     private Set<User> usersMentioned = new HashSet<>();
 
+    // TODO: Required property. Add @NotNull annotation.
     @ManyToMany(mappedBy = "likedTweets")
     private Set<User> likes = new HashSet<>();
 
+    // TODO: Required property. Add @NotNull annotation.
     @OneToMany(mappedBy = "repostOf")
     private Set<Tweet> reposts = new HashSet<>();
 
@@ -47,6 +52,7 @@ public class Tweet {
     @JoinColumn(name = "repost_id")
     private Tweet repostOf;
 
+    // TODO: Required property. Add @NotNull annotation.
     @OneToMany(mappedBy = "inReplyTo")
     private Set<Tweet> replies = new HashSet<>();
 
@@ -56,11 +62,21 @@ public class Tweet {
 
     private String content;
 
+    // TODO: Required property. Add @NotNull annotation.
     private boolean deleted;
 
+    // TODO: Does this specifically need to be of type 'Timestamp'?
+    // TODO: Required property. Add @NotNull annotation.
     @Column(name = "created_on")
     @CreationTimestamp
     private Date posted;
+
+    /*
+    TODO: Should we add 'Context' as a subclass of 'Tweet'? We could assign the 'target', 'before', and 'after'
+        fields to be abstract methods, such as, 'getTargetTweet()', 'getBeforeTweet()', 'getAfterTweet()', and define
+        them below? For example, the 'getAfterTweet()' method would have the logic for getting a chain of replies
+        that follow the target tweet, and we could use this method in the 'GET tweets/{id}/context' endpoint.
+    */
 
     public void addMentionedUser(User user) {
         this.usersMentioned.add(user);

@@ -9,6 +9,14 @@ import com.socialmediaassignment.team3.entities.embeddable.Credential;
 import java.util.List;
 
 public interface TweetService {
+    List<TweetResponseDto> getUserTweets(String username);
+
+    List<TweetResponseDto> getTweetsByMention(String username);
+
+    List<TweetResponseDto> getUserFeed(String username);
+
+//    List<TweetResponseDto> getTweetContext(Long id);
+
     List<TweetResponseDto> getActiveTweets();
 
     TweetResponseDto getTweetById(Long id);

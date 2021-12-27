@@ -31,15 +31,22 @@ public class User {
     @Embedded
     private Profile profile;
 
+    // TODO: Does this specifically need to be of type 'Timestamp'?
+    // TODO: Required property. Add @NotNull annotation.
     @Column(name = "created_on")
     @CreationTimestamp
     private Date joined;
 
+    // TODO: Required property. Add @NotNull annotation.
     private boolean deleted;
 
+    // TODO: Does this specifically need to be of type 'List<Tweet>'?
+    // TODO: Required property. Add @NotNull annotation.
     @OneToMany(mappedBy = "author")
     private Set<Tweet> tweets = new HashSet<>();
 
+    // TODO: Does this specifically need to be of type 'List<Tweet>'?
+    // TODO: Required property. Add @NotNull annotation.
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "tweet_like_mapping",
             joinColumns = {@JoinColumn(name = "tweet_id")},
@@ -47,6 +54,8 @@ public class User {
     )
     private Set<Tweet> likedTweets = new HashSet<>();
 
+    // TODO: Does this specifically need to be of type 'List<Tweet>'?
+    // TODO: Required property. Add @NotNull annotation.
     @ManyToMany(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
     @JoinTable(name = "mention_mapping",
         joinColumns = {@JoinColumn(name = "tweet_id")},
@@ -54,6 +63,8 @@ public class User {
     )
     private Set<Tweet> mentions = new HashSet<>();
 
+    // TODO: Does this specifically need to be of type 'List<User>'?
+    // TODO: Required property. Add @NotNull annotation.
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name="follower_following_mapping",
         joinColumns = {@JoinColumn(name="follower_id")},
@@ -61,6 +72,8 @@ public class User {
     )
     private Set<User> following = new HashSet<>();
 
+    // TODO: Does this specifically need to be of type 'List<User>'?
+    // TODO: Required property. Add @NotNull annotation.
     @ManyToMany(mappedBy = "following", fetch = FetchType.EAGER)
     private Set<User> followers = new HashSet<>();
 

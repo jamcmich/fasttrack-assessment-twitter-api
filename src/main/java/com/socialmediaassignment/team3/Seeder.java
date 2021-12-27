@@ -12,6 +12,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
@@ -26,6 +28,7 @@ public class Seeder implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
+        // Custom test cases
         Credential cred1 = new Credential("felo", "pass123");
         Profile prof1 = new Profile("Felo", "Foo", "felo@gmail.com", "987-654-3210");
         User user1 = new User();
@@ -44,25 +47,42 @@ public class Seeder implements CommandLineRunner {
 
         User user2Saved = userRepository.saveAndFlush(user2);
 
-        user1Saved.addFollowing(user2Saved);
-        user2Saved.addFollower(user1Saved);
-        user2Saved.addFollowing(user1Saved);
-        user1Saved.addFollower(user2Saved);
+        user1Saved.addFollowing(user2Saved); // felo is following angulo
+        user2Saved.addFollower(user1Saved); // angulo is followed by felo
+        user2Saved.addFollowing(user1Saved); // angulo is following felo
+        user1Saved.addFollower(user2Saved); // felo is followed by angulo
 
-        User s1 = userRepository.saveAndFlush(user1Saved);
-        User s2 = userRepository.saveAndFlush(user2Saved);
+        User s1 = userRepository.saveAndFlush(user1Saved); // felo
+        User s2 = userRepository.saveAndFlush(user2Saved); // angulo
 
         Tweet tweet = new Tweet();
         tweet.setAuthor(s1);
-        tweet.setContent("Super tweet");
+        tweet.setContent("this is @felo's tweet");
         Tweet savedTweet = tweetRepository.saveAndFlush(tweet);
 
         Tweet tweet1 = new Tweet();
         tweet1.setAuthor(s1);
-        tweet1.setContent("Tweet 2");
+        tweet1.setContent("this is @felo's reply/repost");
         tweet1.setRepostOf(savedTweet);
         tweet1.setInReplyTo(savedTweet);
         Tweet savedTweet1 = tweetRepository.saveAndFlush(tweet1);
+
+        Tweet tweet2 = new Tweet();
+        tweet2.setAuthor(s1);
+        tweet2.setContent("this is @felo's second DELETED tweet");
+        tweet2.setDeleted(true);
+        Tweet savedTweet2 = tweetRepository.saveAndFlush(tweet2);
+
+        Tweet tweet3 = new Tweet();
+        tweet3.setAuthor(s2);
+        tweet3.setContent("this is @angulo's first tweet");
+        Tweet savedTweet3 = tweetRepository.saveAndFlush(tweet3);
+
+        Tweet tweet4 = new Tweet();
+        tweet4.setAuthor(s1);
+        tweet4.setContent("this is @angulo's second DELETED tweet");
+        tweet4.setDeleted(true);
+        Tweet savedTweet4 = tweetRepository.saveAndFlush(tweet4);
 
         savedTweet1.addLike(s2);
         savedTweet1.addMentionedUser(s1);
@@ -71,14 +91,14 @@ public class Seeder implements CommandLineRunner {
         userRepository.saveAndFlush(s1);
         userRepository.saveAndFlush(s2);
 
-
-
         Hashtag hashtag = new Hashtag();
         hashtag.setLabel("some-hashtag-label");
         hashtag.setTweets(Set.of(tweet, tweet1));
         hashtagRepository.saveAndFlush(hashtag);
 
+        // Generator test cases
         Set<User> testUsers = new HashSet<>();
+        Set<Tweet> testTweets = new HashSet<>();
         for (int i = 0; i < 10; i++) {
             Credential credential = new Credential(
                     "test-username-" + i,
@@ -96,7 +116,16 @@ public class Seeder implements CommandLineRunner {
             user.setCredential(credential);
             user.setDeleted(new Random().nextBoolean());
             user.setProfile(profile);
+
             testUsers.add(userRepository.saveAndFlush(user));
+
+            Tweet t = new Tweet();
+            t.setContent("test to mention @angulo by " + user.getCredential().getUsername());
+            t.setAuthor(user);
+            t.setPosted(new Date());
+            t.setDeleted(new Random().nextBoolean());
+
+            testTweets.add(tweetRepository.saveAndFlush(t));
         }
 
         for (User user : testUsers) {

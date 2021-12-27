@@ -25,16 +25,22 @@ public class Hashtag {
     @GeneratedValue
     private Long id;
 
+    // TODO: 'label' property must be unique and case-sensitive.
     @NotNull
     private String label;
 
+    // TODO: Required property. Add @NotNull annotation.
     @ManyToMany(mappedBy = "hashtags")
     private Set<Tweet> tweets = new HashSet<>();
 
+    // TODO: Does this specifically need to be of type 'Timestamp'?
+    // TODO: Required property. Add @NotNull annotation.
     @Column(name = "created_on")
     @CreationTimestamp
     private Date firstUsed;
 
+    // TODO: Does this specifically need to be of type 'Timestamp'?
+    // TODO: Required property. Add @NotNull annotation.
     @NotNull
     private Date lastUsed;
 

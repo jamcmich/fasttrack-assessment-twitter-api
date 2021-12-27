@@ -13,6 +13,7 @@ import javax.persistence.Embeddable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Credential {
+    // TODO: Is 'username' a required property?
     @NotNull
     @Column(unique = true)
     private String username;

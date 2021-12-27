@@ -5,7 +5,10 @@ import com.socialmediaassignment.team3.exceptions.BadRequestException;
 import com.socialmediaassignment.team3.exceptions.NotFoundException;
 import com.socialmediaassignment.team3.exceptions.UnauthorizedException;
 import org.springframework.http.HttpStatus;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.servlet.http.HttpServletRequest;
 
