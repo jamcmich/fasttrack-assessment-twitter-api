@@ -1,8 +1,10 @@
 package com.socialmediaassignment.team3.controllers;
 
+import com.socialmediaassignment.team3.dtos.TweetResponseDto;
 import com.socialmediaassignment.team3.dtos.UserRequestDto;
 import com.socialmediaassignment.team3.dtos.UserResponseDto;
 import com.socialmediaassignment.team3.entities.embeddable.Credential;
+import com.socialmediaassignment.team3.services.TweetService;
 import com.socialmediaassignment.team3.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -15,6 +17,7 @@ import java.util.List;
 @RequestMapping("/users")
 public class UserController {
     private final UserService userService;
+    private final TweetService tweetService;
 
     /*
         GET users
@@ -98,5 +101,33 @@ public class UserController {
     @GetMapping("/@{username}/following")
     public List<UserResponseDto> getFollowedUsers(@PathVariable String username) {
         return userService.getFollowedUsers(username);
+    }
+
+    /*
+        GET users/@{username}/tweets
+        Retrieves all (non-deleted) tweets authored by the user with the given username.
+    */
+    @GetMapping("/@{username}/tweets")
+    public List<TweetResponseDto> getUserTweets(@PathVariable String username) {
+        return tweetService.getUserTweets(username);
+    }
+
+    /*
+        GET users/@{username}/mentions
+        Retrieves all (non-deleted) tweets in which the user with the given username is mentioned.
+    */
+    @GetMapping("/@{username}/mentions")
+    public List<TweetResponseDto> getTweetsByMention(@PathVariable String username) {
+        return tweetService.getTweetsByMention(username);
+    }
+
+    /*
+        GET users/@{username}/feed
+        Retrieves all (non-deleted) tweets authored by the user with the given username,
+        as well as all (non-deleted) tweets authored by users the given user is following.
+     */
+    @GetMapping("/@{username}/feed")
+    public List<TweetResponseDto> getUserFeed(@PathVariable String username) {
+        return tweetService.getUserFeed(username);
     }
 }

@@ -75,32 +75,4 @@ public class TweetController {
     public List<UserResponseDto> getMentionInTweetById(@PathVariable Long id) {
         return tweetService.getMentionInTweetById(id);
     }
-
-    /*
-        GET users/@{username}/tweets
-        Retrieves all (non-deleted) tweets authored by the user with the given username.
-    */
-    @GetMapping("/@{username}/tweets")
-    public List<TweetResponseDto> getUserTweets(@PathVariable String username) {
-        return tweetService.getUserTweets(username);
-    }
-
-    /*
-        GET users/@{username}/mentions
-        Retrieves all (non-deleted) tweets in which the user with the given username is mentioned.
-    */
-    @GetMapping("/@{username}/mentions")
-    public List<TweetResponseDto> getTweetsByMention(@PathVariable String username) {
-        return tweetService.getTweetsByMention(username);
-    }
-
-    /*
-        GET users/@{username}/feed
-        Retrieves all (non-deleted) tweets authored by the user with the given username,
-        as well as all (non-deleted) tweets authored by users the given user is following.
-     */
-    @GetMapping("/@{username}/feed")
-    public List<TweetResponseDto> getUserFeed(@PathVariable String username) {
-        return tweetService.getUserFeed(username);
-    }
 }
