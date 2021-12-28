@@ -37,6 +37,7 @@ public class UserServiceImpl implements UserService {
             user = userMapper.createDtoToEntity(userRequestDto);
         else if (user.isDeleted()) {
             _setCredentialAndProfile(user, userRequestDto);
+            user.setDeleted(false);
         }
         else
             throw new BadRequestException("Username must be unique");

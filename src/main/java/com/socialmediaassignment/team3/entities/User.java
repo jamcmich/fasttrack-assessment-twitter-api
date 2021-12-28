@@ -120,4 +120,9 @@ public class User {
         if (this.getProfile().getEmail() == null)
             throw new BadRequestException("Field 'email' is required");
     }
+
+    @Override
+    public String toString() {
+        return this.getCredential().getUsername();
+    }
 }

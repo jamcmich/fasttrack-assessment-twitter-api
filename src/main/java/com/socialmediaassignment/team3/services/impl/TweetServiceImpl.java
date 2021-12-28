@@ -71,9 +71,9 @@ public class TweetServiceImpl implements TweetService {
     public ContextResponseDto getContextForTweet(Long id) {
         Tweet tweet = _getActiveTweetById(id);
         ContextResponseDto responseDto = new ContextResponseDto();
-        responseDto.setTarget(tweet);
-        responseDto.setBefore(_getTweetsBefore(tweet));
-        responseDto.setAfter(_getTweetsAfter(tweet));
+        responseDto.setTarget(tweetMapper.entityToDto(tweet));
+        responseDto.setBefore(tweetMapper.entitiesToDtos(_getTweetsBefore(tweet)));
+        responseDto.setAfter(tweetMapper.entitiesToDtos(_getTweetsAfter(tweet)));
         return responseDto;
     }
 
