@@ -36,10 +36,11 @@ public class UserServiceImpl implements UserService {
         if (user == null)
             user = userMapper.createDtoToEntity(userRequestDto);
         else if (user.isDeleted()) {
-            user = _setCredentialAndProfile(user, userRequestDto);
+            _setCredentialAndProfile(user, userRequestDto);
         }
         else
             throw new BadRequestException("Username must be unique");
+        user.validateUser();
         return userMapper.entityToDto(userRepository.saveAndFlush(user));
     }
 
@@ -55,8 +56,8 @@ public class UserServiceImpl implements UserService {
     public UserResponseDto updateUser(String username, UserRequestDto userRequestDto) {
         User toUpdate = _authorizeCredential(userRequestDto.getCredential());
 
-        toUpdate = _setCredentialAndProfile(toUpdate, userRequestDto);
-        toUpdate.getCredential().setUsername(username);
+        toUpdate.setProfile(userRequestDto.getProfile());
+        toUpdate.validateUser();
         return userMapper.entityToDto(userRepository.saveAndFlush(toUpdate));
     }
 
@@ -101,10 +102,9 @@ public class UserServiceImpl implements UserService {
         return userOptional.get();
     }
 
-    private User _setCredentialAndProfile (User user, UserRequestDto userRequestDto) {
+    private void _setCredentialAndProfile (User user, UserRequestDto userRequestDto) {
         user.setCredential(userRequestDto.getCredential());
         user.setProfile(userRequestDto.getProfile());
-        return user;
     }
 
     private User _authorizeCredential(Credential credential) {
