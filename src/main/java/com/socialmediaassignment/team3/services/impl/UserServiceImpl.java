@@ -118,6 +118,8 @@ public class UserServiceImpl implements UserService {
     public void unFollowUser(String username, Credential credential) {
         User toBeUnfollowed = _getUserByUsername(username);
         User follower = _authorizeCredential(credential);
+        if (Objects.equals(toBeUnfollowed.getCredential().getUsername(), follower.getCredential().getUsername()))
+            throw new BadRequestException("You can't unfollow yourself!");
         if (!isActive(toBeUnfollowed))
             throw new BadRequestException("User not found");
         if (!follower.getFollowing().contains(toBeUnfollowed))
