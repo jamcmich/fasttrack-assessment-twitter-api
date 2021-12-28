@@ -42,6 +42,7 @@ public class UserServiceImpl implements UserService {
         POST users
         Creates a new user.
     */
+    // TODO: Could not create a new user with the required POST request.
     @Override
     public UserResponseDto createUser(UserRequestDto userRequestDto) {
         User user = _getUserByUsername(userRequestDto.getCredential().getUsername());
