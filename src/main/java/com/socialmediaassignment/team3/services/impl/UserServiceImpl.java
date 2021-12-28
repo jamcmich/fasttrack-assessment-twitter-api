@@ -42,7 +42,6 @@ public class UserServiceImpl implements UserService {
         POST users
         Creates a new user.
     */
-    // TODO: Could not create a new user with the required POST request.
     @Override
     public UserResponseDto createUser(UserRequestDto userRequestDto) {
         User user = _getUserByUsername(userRequestDto.getCredential().getUsername());
@@ -50,6 +49,7 @@ public class UserServiceImpl implements UserService {
             user = userMapper.createDtoToEntity(userRequestDto);
         else if (user.isDeleted()) {
             user = _setCredentialAndProfile(user, userRequestDto);
+            user.setDeleted(false);
         }
         else
             throw new BadRequestException("Username must be unique");
