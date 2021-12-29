@@ -101,7 +101,7 @@ public class TweetServiceImpl implements TweetService {
     @Override
     public List<TweetResponseDto> getRepostOfTweetById(Long id) {
         Tweet tweet = _getActiveTweetById(id);
-        return tweetMapper.entitiesToDtos(tweet.getReposts().stream().collect(Collectors.toList()));
+        return tweetMapper.entitiesToDtos(_activeTweets(tweet.getReposts()));
     }
 
     @Override
@@ -120,13 +120,19 @@ public class TweetServiceImpl implements TweetService {
     @Override
     public List<TweetResponseDto> getRepliesToTweetById(Long id) {
         Tweet tweet = _getActiveTweetById(id);
-        return tweetMapper.entitiesToDtos(tweet.getReplies().stream().filter(t -> !t.isDeleted()).collect(Collectors.toList()));
+        return tweetMapper.entitiesToDtos(_activeTweets(tweet.getReplies()));
     }
 
     @Override
     public List<UserResponseDto> getMentionInTweetById(Long id) {
         Tweet tweet = _getActiveTweetById(id);
         return userMapper.entitiesToDtos(tweet.getUsersMentioned().stream().filter(u -> !u.isDeleted()).collect(Collectors.toList()));
+    }
+
+    @Override
+    public List<UserResponseDto> getLikeForTweet(Long id) {
+        Tweet tweet = _getActiveTweetById(id);
+        return userMapper.entitiesToDtos(tweet.getLikes().stream().filter(u -> !u.isDeleted()).collect(Collectors.toList()));
     }
 
 
@@ -221,5 +227,9 @@ public class TweetServiceImpl implements TweetService {
         if (userOptional.isEmpty())
             return null;
         return userOptional.get();
+    }
+
+    private List<Tweet> _activeTweets (Collection<Tweet> tweets) {
+        return tweets.stream().filter(t -> !t.isDeleted()).collect(Collectors.toList());
     }
 }
