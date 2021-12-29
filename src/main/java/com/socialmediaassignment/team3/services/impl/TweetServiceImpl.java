@@ -145,6 +145,15 @@ public class TweetServiceImpl implements TweetService {
         Tweet tweet = new Tweet();
         tweet.setAuthor(author);
         tweet.setContent(tweetRequestDto.getContent());
+
+        // TODO: Create logic for updating hashtag's lastUsed property.
+//        Set<Hashtag> hashtags = tweet.getHashtags();
+//        if (tweet.getHashtags() != null) {
+//            for (Hashtag hashtag : hashtags) {
+//                hashtag.setLastUsed(tweet.getPosted());
+//            }
+//        }
+
         _processTweetContent(tweet);
         return tweetMapper.entityToDto(tweetRepository.saveAndFlush(tweet));
     }

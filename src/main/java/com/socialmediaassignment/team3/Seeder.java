@@ -84,17 +84,25 @@ public class Seeder implements CommandLineRunner {
         tweet4.setDeleted(true);
         Tweet savedTweet4 = tweetRepository.saveAndFlush(tweet4);
 
+        Hashtag hashtag = new Hashtag();
+        hashtag.setLabel("some-hashtag-label");
+//        hashtag.setLastUsed(new Date());
+        hashtagRepository.saveAndFlush(hashtag);
+
+        Hashtag hashtag1 = new Hashtag();
+        hashtag1.setLabel("some-hashtag-label-1");
+//        hashtag.setLastUsed(new Date());
+        hashtagRepository.saveAndFlush(hashtag1);
+
+        savedTweet.setHashtags(Set.of(hashtag));
+
         savedTweet1.addLike(s2);
         savedTweet1.addMentionedUser(s1);
+        savedTweet1.setHashtags(Set.of(hashtag, hashtag1));
 
         Tweet tw1 = tweetRepository.saveAndFlush(savedTweet1);
         userRepository.saveAndFlush(s1);
         userRepository.saveAndFlush(s2);
-
-        Hashtag hashtag = new Hashtag();
-        hashtag.setLabel("some-hashtag-label");
-        hashtag.setTweets(Set.of(tweet, tweet1));
-        hashtagRepository.saveAndFlush(hashtag);
 
         // Generator test cases
         Set<User> testUsers = new HashSet<>();

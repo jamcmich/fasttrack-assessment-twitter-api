@@ -40,7 +40,6 @@ public class Hashtag {
     private Date firstUsed;
 
     // TODO: Does this specifically need to be of type 'Timestamp'?
-    // TODO: Required property. Add @NotNull annotation.
     @NotNull
     private Date lastUsed;
 
