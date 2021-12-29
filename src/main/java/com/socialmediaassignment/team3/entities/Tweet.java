@@ -22,13 +22,11 @@ public class Tweet {
     @GeneratedValue
     private Long id;
 
-    // TODO: 'author' is not a required property. Remove @NotNull annotation.
     @ManyToOne
     @JoinColumn(name = "author_id")
-    @NotNull
     private User author;
 
-    // TODO: Required property. Add @NotNull annotation.
+    @NotNull
     @ManyToMany(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
     @JoinTable(name = "tweet_hashtag_mapping",
             joinColumns = {@JoinColumn(name = "hashtag_id")},
@@ -36,15 +34,15 @@ public class Tweet {
     )
     private Set<Hashtag> hashtags = new HashSet<>();
 
-    // TODO: Required property. Add @NotNull annotation.
+    @NotNull
     @ManyToMany(mappedBy = "mentions")
     private Set<User> usersMentioned = new HashSet<>();
 
-    // TODO: Required property. Add @NotNull annotation.
+    @NotNull
     @ManyToMany(mappedBy = "likedTweets")
     private Set<User> likes = new HashSet<>();
 
-    // TODO: Required property. Add @NotNull annotation.
+    @NotNull
     @OneToMany(mappedBy = "repostOf")
     private Set<Tweet> reposts = new HashSet<>();
 
@@ -52,7 +50,7 @@ public class Tweet {
     @JoinColumn(name = "repost_id")
     private Tweet repostOf;
 
-    // TODO: Required property. Add @NotNull annotation.
+    @NotNull
     @OneToMany(mappedBy = "inReplyTo")
     private Set<Tweet> replies = new HashSet<>();
 
@@ -62,11 +60,11 @@ public class Tweet {
 
     private String content;
 
-    // TODO: Required property. Add @NotNull annotation.
+    @NotNull
     private boolean deleted;
 
     // TODO: Does this specifically need to be of type 'Timestamp'?
-    // TODO: Required property. Add @NotNull annotation.
+    @NotNull
     @Column(name = "created_on")
     @CreationTimestamp
     private Date posted;

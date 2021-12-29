@@ -1,18 +1,18 @@
 package com.socialmediaassignment.team3.entities;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.socialmediaassignment.team3.entities.embeddable.Credential;
 import com.socialmediaassignment.team3.entities.embeddable.Profile;
+import com.sun.istack.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
-import java.util.*;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @NoArgsConstructor
@@ -32,21 +32,21 @@ public class User {
     private Profile profile;
 
     // TODO: Does this specifically need to be of type 'Timestamp'?
-    // TODO: Required property. Add @NotNull annotation.
+    @NotNull
     @Column(name = "created_on")
     @CreationTimestamp
     private Date joined;
 
-    // TODO: Required property. Add @NotNull annotation.
+    @NotNull
     private boolean deleted;
 
     // TODO: Does this specifically need to be of type 'List<Tweet>'?
-    // TODO: Required property. Add @NotNull annotation.
+    @NotNull
     @OneToMany(mappedBy = "author")
     private Set<Tweet> tweets = new HashSet<>();
 
     // TODO: Does this specifically need to be of type 'List<Tweet>'?
-    // TODO: Required property. Add @NotNull annotation.
+    @NotNull
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "tweet_like_mapping",
             joinColumns = {@JoinColumn(name = "tweet_id")},
@@ -55,7 +55,7 @@ public class User {
     private Set<Tweet> likedTweets = new HashSet<>();
 
     // TODO: Does this specifically need to be of type 'List<Tweet>'?
-    // TODO: Required property. Add @NotNull annotation.
+    @NotNull
     @ManyToMany(cascade = {CascadeType.ALL}, fetch = FetchType.EAGER)
     @JoinTable(name = "mention_mapping",
         joinColumns = {@JoinColumn(name = "tweet_id")},
@@ -64,7 +64,7 @@ public class User {
     private Set<Tweet> mentions = new HashSet<>();
 
     // TODO: Does this specifically need to be of type 'List<User>'?
-    // TODO: Required property. Add @NotNull annotation.
+    @NotNull
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name="follower_following_mapping",
         joinColumns = {@JoinColumn(name="follower_id")},
@@ -73,7 +73,7 @@ public class User {
     private Set<User> following = new HashSet<>();
 
     // TODO: Does this specifically need to be of type 'List<User>'?
-    // TODO: Required property. Add @NotNull annotation.
+    @NotNull
     @ManyToMany(mappedBy = "following", fetch = FetchType.EAGER)
     private Set<User> followers = new HashSet<>();
 

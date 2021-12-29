@@ -1,8 +1,6 @@
 package com.socialmediaassignment.team3.entities;
 
-import com.fasterxml.jackson.annotation.JsonIdentityInfo;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.sun.istack.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -12,7 +10,6 @@ import org.hibernate.annotations.CreationTimestamp;
 import javax.persistence.*;
 import java.util.Date;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -25,16 +22,16 @@ public class Hashtag {
     @GeneratedValue
     private Long id;
 
-    // TODO: 'label' property must be unique and case-sensitive.
     @NotNull
+    @Column(unique = true)
     private String label;
 
-    // TODO: Required property. Add @NotNull annotation.
+    @NotNull
     @ManyToMany(mappedBy = "hashtags")
     private Set<Tweet> tweets = new HashSet<>();
 
     // TODO: Does this specifically need to be of type 'Timestamp'?
-    // TODO: Required property. Add @NotNull annotation.
+    @NotNull
     @Column(name = "created_on")
     @CreationTimestamp
     private Date firstUsed;

@@ -13,12 +13,8 @@ import javax.persistence.Embeddable;
 @NoArgsConstructor
 @AllArgsConstructor
 public class Credential {
-    // TODO: 'username' is not a required property. Remove @NotNull.
-    @NotNull
     @Column(unique = true)
     private String username;
 
-    // TODO: 'password' is not a required property. Remove @NotNull.
-    @NotNull
     private String password;
 }
