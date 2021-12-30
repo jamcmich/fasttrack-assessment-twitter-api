@@ -62,25 +62,25 @@ public class Seeder implements CommandLineRunner {
 
         Tweet tweet1 = new Tweet();
         tweet1.setAuthor(s1);
-        tweet1.setContent("this is @felo's reply/repost");
+        tweet1.setContent("this is @felo's reply/repost" + " with the tag #some-hashtag-label");
         tweet1.setRepostOf(savedTweet);
         tweet1.setInReplyTo(savedTweet);
         Tweet savedTweet1 = tweetRepository.saveAndFlush(tweet1);
 
         Tweet tweet2 = new Tweet();
         tweet2.setAuthor(s1);
-        tweet2.setContent("this is @felo's second DELETED tweet");
+        tweet2.setContent("this is @felo's second DELETED tweet" + " with the tag #some-hashtag-label");
         tweet2.setDeleted(true);
         Tweet savedTweet2 = tweetRepository.saveAndFlush(tweet2);
 
         Tweet tweet3 = new Tweet();
         tweet3.setAuthor(s2);
-        tweet3.setContent("this is @angulo's first tweet");
+        tweet3.setContent("this is @angulo's first tweet" + " with the tag");
         Tweet savedTweet3 = tweetRepository.saveAndFlush(tweet3);
 
         Tweet tweet4 = new Tweet();
         tweet4.setAuthor(s1);
-        tweet4.setContent("this is @angulo's second DELETED tweet");
+        tweet4.setContent("this is @angulo's second DELETED tweet" + " with the tag");
         tweet4.setDeleted(true);
         Tweet savedTweet4 = tweetRepository.saveAndFlush(tweet4);
 
@@ -98,7 +98,7 @@ public class Seeder implements CommandLineRunner {
 
         savedTweet1.addLike(s2);
         savedTweet1.addMentionedUser(s1);
-        savedTweet1.setHashtags(Set.of(hashtag, hashtag1));
+        savedTweet1.setHashtags(Set.of(hashtag));
 
         Tweet tw1 = tweetRepository.saveAndFlush(savedTweet1);
         userRepository.saveAndFlush(s1);
