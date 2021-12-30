@@ -158,6 +158,24 @@ public class TweetServiceImpl implements TweetService {
     }
 
     @Override
+    public List<UserResponseDto> getUsersByTweetLikes(Long id) {
+        Optional<Tweet> tweet = tweetRepository.findById(id);
+
+        if (tweet.isEmpty())
+            throw new BadRequestException("Tweet does not exist.");
+
+        List<User> result = new ArrayList<>();
+
+        List<User> users = userRepository.findAll();
+        for (User user : users) {
+            if (tweet.get().getLikes().contains(user) && !user.isDeleted()) {
+                result.add(user);
+            }
+        }
+        return userMapper.entitiesToDtos(result);
+    }
+
+    @Override
     public ContextResponseDto getContextForTweet(Long id) {
         Tweet tweet = _getActiveTweetById(id);
         ContextResponseDto responseDto = new ContextResponseDto();
@@ -218,7 +236,6 @@ public class TweetServiceImpl implements TweetService {
         Tweet tweet = _getActiveTweetById(id);
         return userMapper.entitiesToDtos(tweet.getUsersMentioned().stream().filter(u -> !u.isDeleted()).collect(Collectors.toList()));
     }
-
 
     private User _authorizeCredential(Credential credential) {
         Optional<User> userOptional = userRepository.findOneByCredential(credential);

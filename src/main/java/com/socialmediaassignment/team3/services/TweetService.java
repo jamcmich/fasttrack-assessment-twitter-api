@@ -15,8 +15,6 @@ public interface TweetService {
 
     List<TweetResponseDto> getUserFeed(String username);
 
-//    List<TweetResponseDto> getTweetContext(Long id);
-
     List<TweetResponseDto> getActiveTweets();
 
     TweetResponseDto getTweetById(Long id);
@@ -38,4 +36,6 @@ public interface TweetService {
     List<TweetResponseDto> getRepliesToTweetById(Long id);
 
     List<UserResponseDto> getMentionInTweetById(Long id);
+
+    List<UserResponseDto> getUsersByTweetLikes(Long id);
 }

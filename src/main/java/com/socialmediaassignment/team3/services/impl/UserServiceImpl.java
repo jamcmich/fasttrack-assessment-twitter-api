@@ -2,6 +2,7 @@ package com.socialmediaassignment.team3.services.impl;
 
 import com.socialmediaassignment.team3.dtos.UserRequestDto;
 import com.socialmediaassignment.team3.dtos.UserResponseDto;
+import com.socialmediaassignment.team3.entities.Tweet;
 import com.socialmediaassignment.team3.entities.User;
 import com.socialmediaassignment.team3.entities.embeddable.Credential;
 import com.socialmediaassignment.team3.exceptions.BadRequestException;
@@ -9,7 +10,9 @@ import com.socialmediaassignment.team3.exceptions.NotFoundException;
 import com.socialmediaassignment.team3.exceptions.UnauthorizedException;
 import com.socialmediaassignment.team3.exceptions.BadRequestException;
 import com.socialmediaassignment.team3.mappers.UserMapper;
+import com.socialmediaassignment.team3.repositories.TweetRepository;
 import com.socialmediaassignment.team3.repositories.UserRepository;
+import com.socialmediaassignment.team3.services.TweetService;
 import com.socialmediaassignment.team3.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

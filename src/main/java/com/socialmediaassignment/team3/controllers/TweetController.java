@@ -6,6 +6,7 @@ import com.socialmediaassignment.team3.dtos.TweetResponseDto;
 import com.socialmediaassignment.team3.dtos.UserResponseDto;
 import com.socialmediaassignment.team3.entities.embeddable.Credential;
 import com.socialmediaassignment.team3.services.TweetService;
+import com.socialmediaassignment.team3.services.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -17,6 +18,7 @@ import java.util.List;
 @RequestMapping("/tweets")
 public class TweetController {
     private final TweetService tweetService;
+    private final UserService userService;
 
     @GetMapping
     public List<TweetResponseDto> getAllTweets() {
@@ -37,6 +39,11 @@ public class TweetController {
     @PostMapping("/{id}/like")
     public void likeTweetById(@PathVariable Long id, @RequestBody Credential credential) {
         tweetService.likeTweetById(id, credential);
+    }
+
+    @GetMapping("/{id}/likes")
+    public List<UserResponseDto> getUsersByTweetLikes(@PathVariable Long id) {
+        return tweetService.getUsersByTweetLikes(id);
     }
 
     @GetMapping("/{id}/context")
