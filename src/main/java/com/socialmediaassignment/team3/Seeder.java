@@ -132,6 +132,7 @@ public class Seeder implements CommandLineRunner {
             t.setAuthor(user);
             t.setPosted(new Date());
             t.setDeleted(new Random().nextBoolean());
+            t.setUsersMentioned(Set.of(user2Saved));
 
             testTweets.add(tweetRepository.saveAndFlush(t));
         }

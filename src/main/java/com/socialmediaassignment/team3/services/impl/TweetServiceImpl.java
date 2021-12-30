@@ -233,8 +233,20 @@ public class TweetServiceImpl implements TweetService {
 
     @Override
     public List<UserResponseDto> getMentionInTweetById(Long id) {
-        Tweet tweet = _getActiveTweetById(id);
-        return userMapper.entitiesToDtos(tweet.getUsersMentioned().stream().filter(u -> !u.isDeleted()).collect(Collectors.toList()));
+        Tweet tweet = tweetRepository.findById(id).get();
+        if (tweet.isDeleted())
+            throw new BadRequestException("Tweet does not exist.");
+
+        List<User> result = new ArrayList<>();
+
+        List<User> users = userRepository.findAll();
+        for (User user : users) {
+            if (!user.isDeleted() && tweet.getContent().contains("@" + user.getCredential().getUsername())) {
+                result.add(user);
+            }
+        }
+
+        return userMapper.entitiesToDtos(result);
     }
 
     private User _authorizeCredential(Credential credential) {
