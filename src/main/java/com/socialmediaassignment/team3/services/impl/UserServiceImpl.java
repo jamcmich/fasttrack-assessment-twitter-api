@@ -36,10 +36,12 @@ public class UserServiceImpl implements UserService {
         if (user == null)
             user = userMapper.createDtoToEntity(userRequestDto);
         else if (user.isDeleted()) {
-            user = _setCredentialAndProfile(user, userRequestDto);
+            _setCredentialAndProfile(user, userRequestDto);
+            user.setDeleted(false);
         }
         else
             throw new BadRequestException("Username must be unique");
+        user.validateUser();
         return userMapper.entityToDto(userRepository.saveAndFlush(user));
     }
 
@@ -55,8 +57,8 @@ public class UserServiceImpl implements UserService {
     public UserResponseDto updateUser(String username, UserRequestDto userRequestDto) {
         User toUpdate = _authorizeCredential(userRequestDto.getCredential());
 
-        toUpdate = _setCredentialAndProfile(toUpdate, userRequestDto);
-        toUpdate.getCredential().setUsername(username);
+        toUpdate.setProfile(userRequestDto.getProfile());
+        toUpdate.validateUser();
         return userMapper.entityToDto(userRepository.saveAndFlush(toUpdate));
     }
 
@@ -93,6 +95,24 @@ public class UserServiceImpl implements UserService {
         userRepository.saveAndFlush(toBeUnfollowed);
     }
 
+    @Override
+    public List<UserResponseDto> getFollowers(String username) {
+        User user = _getUserByUsername(username);
+
+        if (!isActive(user))
+            throw new NotFoundException("User not found");
+        return userMapper.entitiesToDtos(user.getFollowers().stream().filter(u -> !u.isDeleted()).collect(Collectors.toList()));
+    }
+
+    @Override
+    public List<UserResponseDto> getFollowedUsers(String username) {
+        User user = _getUserByUsername(username);
+
+        if (!isActive(user))
+            throw new NotFoundException("User not found");
+        return userMapper.entitiesToDtos(user.getFollowing().stream().filter(u -> !u.isDeleted()).collect(Collectors.toList()));
+    }
+
     // Auxiliary functions
     private User _getUserByUsername(String username) {
         Optional<User> userOptional = userRepository.findByCredentialUsername(username);
@@ -101,10 +121,9 @@ public class UserServiceImpl implements UserService {
         return userOptional.get();
     }
 
-    private User _setCredentialAndProfile (User user, UserRequestDto userRequestDto) {
+    private void _setCredentialAndProfile (User user, UserRequestDto userRequestDto) {
         user.setCredential(userRequestDto.getCredential());
         user.setProfile(userRequestDto.getProfile());
-        return user;
     }
 
     private User _authorizeCredential(Credential credential) {

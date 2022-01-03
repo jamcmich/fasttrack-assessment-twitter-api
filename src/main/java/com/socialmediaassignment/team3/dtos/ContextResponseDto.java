@@ -9,7 +9,7 @@ import java.util.List;
 @NoArgsConstructor
 @Data
 public class ContextResponseDto {
-    private Tweet target;
-    private List<Tweet> before;
-    private List<Tweet> after;
+    private TweetResponseDto target;
+    private List<TweetResponseDto> before;
+    private List<TweetResponseDto> after;
 }

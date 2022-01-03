@@ -16,7 +16,6 @@ public class Profile {
 
     private String lastName;
 
-    @NotNull
     private String email;
 
     private String phone;

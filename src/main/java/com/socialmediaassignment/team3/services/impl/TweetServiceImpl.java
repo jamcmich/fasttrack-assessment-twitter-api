@@ -10,6 +10,7 @@ import com.socialmediaassignment.team3.entities.Tweet;
 import com.socialmediaassignment.team3.entities.User;
 import com.socialmediaassignment.team3.entities.embeddable.Credential;
 import com.socialmediaassignment.team3.exceptions.BadRequestException;
+import com.socialmediaassignment.team3.exceptions.NotFoundException;
 import com.socialmediaassignment.team3.exceptions.UnauthorizedException;
 import com.socialmediaassignment.team3.mappers.TweetMapper;
 import com.socialmediaassignment.team3.mappers.UserMapper;
@@ -71,9 +72,9 @@ public class TweetServiceImpl implements TweetService {
     public ContextResponseDto getContextForTweet(Long id) {
         Tweet tweet = _getActiveTweetById(id);
         ContextResponseDto responseDto = new ContextResponseDto();
-        responseDto.setTarget(tweet);
-        responseDto.setBefore(_getTweetsBefore(tweet));
-        responseDto.setAfter(_getTweetsAfter(tweet));
+        responseDto.setTarget(tweetMapper.entityToDto(tweet));
+        responseDto.setBefore(tweetMapper.entitiesToDtos(_getTweetsBefore(tweet)));
+        responseDto.setAfter(tweetMapper.entitiesToDtos(_getTweetsAfter(tweet)));
         return responseDto;
     }
 
@@ -101,7 +102,7 @@ public class TweetServiceImpl implements TweetService {
     @Override
     public List<TweetResponseDto> getRepostOfTweetById(Long id) {
         Tweet tweet = _getActiveTweetById(id);
-        return tweetMapper.entitiesToDtos(tweet.getReposts().stream().collect(Collectors.toList()));
+        return tweetMapper.entitiesToDtos(_activeTweets(tweet.getReposts()));
     }
 
     @Override
@@ -120,7 +121,7 @@ public class TweetServiceImpl implements TweetService {
     @Override
     public List<TweetResponseDto> getRepliesToTweetById(Long id) {
         Tweet tweet = _getActiveTweetById(id);
-        return tweetMapper.entitiesToDtos(tweet.getReplies().stream().filter(t -> !t.isDeleted()).collect(Collectors.toList()));
+        return tweetMapper.entitiesToDtos(_activeTweets(tweet.getReplies()));
     }
 
     @Override
@@ -129,6 +130,60 @@ public class TweetServiceImpl implements TweetService {
         return userMapper.entitiesToDtos(tweet.getUsersMentioned().stream().filter(u -> !u.isDeleted()).collect(Collectors.toList()));
     }
 
+    @Override
+    public List<UserResponseDto> getLikeForTweet(Long id) {
+        Tweet tweet = _getActiveTweetById(id);
+        return userMapper.entitiesToDtos(tweet.getLikes().stream().filter(u -> !u.isDeleted()).collect(Collectors.toList()));
+    }
+
+    @Override
+    public List<TweetResponseDto> getUserTweets(String username) {
+        User user = _getUserByUsername(username);
+        if (user == null || user.isDeleted())
+            throw new NotFoundException("User not found");
+
+        List<Tweet> response = user.getTweets().stream().filter(t -> !t.isDeleted()).collect(Collectors.toList());
+        response.sort(Comparator.comparing(Tweet::getPosted));
+        Collections.reverse(response);
+        return tweetMapper.entitiesToDtos(response);
+    }
+
+    @Override
+    public List<TweetResponseDto> getTweetsByMention(String username) {
+        User user = _getUserByUsername(username);
+        if (user == null || user.isDeleted())
+            throw new NotFoundException("User not found");
+
+        List<Tweet> response = user.getMentions().stream().filter(t -> !t.isDeleted()).collect(Collectors.toList());
+        response.sort(Comparator.comparing(Tweet::getPosted));
+        Collections.reverse(response);
+        return tweetMapper.entitiesToDtos(response);
+    }
+
+    @Override
+    public List<TweetResponseDto> getUserFeed(String username) {
+        User user = _getUserByUsername(username);
+        if (user == null || user.isDeleted())
+            throw new NotFoundException("User not found");
+
+        Queue<User> userQueue = new LinkedList<>();
+
+        userQueue.add(user);
+        userQueue.addAll(user.getFollowing());
+        Set<Tweet> tweetSet = new HashSet<>();
+
+        while(!userQueue.isEmpty()) {
+            User author = userQueue.poll();
+            if (!author.isDeleted()) {
+                tweetSet.addAll(author.getTweets().stream().filter(t -> !t.isDeleted()).collect(Collectors.toList()));
+            }
+        }
+
+        List<Tweet> response = new ArrayList<>(tweetSet);
+        response.sort(Comparator.comparing(Tweet::getPosted));
+        Collections.reverse(response);
+        return tweetMapper.entitiesToDtos(response);
+    }
 
     private User _authorizeCredential(Credential credential) {
         Optional<User> userOptional = userRepository.findOneByCredential(credential);
@@ -189,11 +244,23 @@ public class TweetServiceImpl implements TweetService {
             tweet.addHashtag(hashtag);
         }
 
+        Set<Hashtag> hashtagSet = new HashSet<>(tweet.getHashtags());
+        for (Hashtag hashtag : hashtagSet) {
+            if (!tagLabels.contains(hashtag.getLabel()))
+                tweet.removeHashtag(hashtag);
+        }
+
         for (String username : mentions) {
             User user = _getUserByUsername(username);
             if (user == null)
                 continue;
             tweet.addMentionedUser(user);
+        }
+
+        Set<User> mentionSet = new HashSet<>(tweet.getUsersMentioned());
+        for (User mention : mentionSet) {
+            if (!mentions.contains(mention.getCredential().getUsername()))
+                tweet.removeMentionedUser(mention);
         }
     }
 
@@ -221,5 +288,9 @@ public class TweetServiceImpl implements TweetService {
         if (userOptional.isEmpty())
             return null;
         return userOptional.get();
+    }
+
+    private List<Tweet> _activeTweets (Collection<Tweet> tweets) {
+        return tweets.stream().filter(t -> !t.isDeleted()).collect(Collectors.toList());
     }
 }

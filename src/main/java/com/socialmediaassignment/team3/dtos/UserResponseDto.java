@@ -1,5 +1,6 @@
 package com.socialmediaassignment.team3.dtos;
 
+import com.fasterxml.jackson.databind.annotation.JsonNaming;
 import com.socialmediaassignment.team3.entities.Tweet;
 import com.socialmediaassignment.team3.entities.User;
 import com.socialmediaassignment.team3.entities.embeddable.Credential;
@@ -13,14 +14,8 @@ import java.util.Set;
 @NoArgsConstructor
 @Data
 public class UserResponseDto {
-    private Long id;
-    private Credential credential;
+
+    private String username;
     private Profile profile;
     private Date joined;
-    private boolean deleted;
-    private Set<Tweet> tweets;
-    private Set<Tweet> likedTweets;
-    private Set<Tweet> mentions;
-    private Set<User> following;
-    private Set<User> followers;
 }

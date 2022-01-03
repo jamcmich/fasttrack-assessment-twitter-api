@@ -25,7 +25,7 @@ public class Hashtag {
     @GeneratedValue
     private Long id;
 
-    @NotNull
+    @Column(nullable = false, unique = true)
     private String label;
 
     @ManyToMany(mappedBy = "hashtags")

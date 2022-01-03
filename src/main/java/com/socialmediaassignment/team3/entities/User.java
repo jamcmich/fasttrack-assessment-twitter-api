@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 import com.socialmediaassignment.team3.entities.embeddable.Credential;
 import com.socialmediaassignment.team3.entities.embeddable.Profile;
+import com.socialmediaassignment.team3.exceptions.BadRequestException;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -26,9 +27,16 @@ public class User {
     private Long id;
 
     @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "username", column = @Column(nullable = false, unique = true)),
+            @AttributeOverride(name = "password", column = @Column(nullable = false))
+    })
     private Credential credential;
 
     @Embedded
+    @AttributeOverrides({
+            @AttributeOverride(name = "email", column = @Column(nullable = false))
+    })
     private Profile profile;
 
     @Column(name = "created_on")
@@ -102,5 +110,19 @@ public class User {
     public void removeLikedTweet(Tweet tweet) {
         this.likedTweets.remove(tweet);
         tweet.getLikes().remove(this);
+    }
+
+    public void validateUser() {
+        if (this.getCredential().getUsername() == null)
+            throw new BadRequestException("Field 'username' is required");
+        if (this.getCredential().getPassword() == null)
+            throw new BadRequestException("Field 'password' is required");
+        if (this.getProfile().getEmail() == null)
+            throw new BadRequestException("Field 'email' is required");
+    }
+
+    @Override
+    public String toString() {
+        return this.getCredential().getUsername();
     }
 }
