@@ -11,7 +11,9 @@ import com.socialmediaassignment.team3.mappers.UserMapper;
 import com.socialmediaassignment.team3.repositories.UserRepository;
 import com.socialmediaassignment.team3.services.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -93,6 +95,24 @@ public class UserServiceImpl implements UserService {
         follower.removeFollowing(toBeUnfollowed);
         userRepository.saveAndFlush(follower);
         userRepository.saveAndFlush(toBeUnfollowed);
+    }
+
+    @Override
+    public List<UserResponseDto> getFollowers(String username) {
+        User user = _getUserByUsername(username);
+
+        if (!isActive(user))
+            throw new NotFoundException("User not found");
+        return userMapper.entitiesToDtos(user.getFollowers().stream().filter(u -> !u.isDeleted()).collect(Collectors.toList()));
+    }
+
+    @Override
+    public List<UserResponseDto> getFollowedUsers(String username) {
+        User user = _getUserByUsername(username);
+
+        if (!isActive(user))
+            throw new NotFoundException("User not found");
+        return userMapper.entitiesToDtos(user.getFollowing().stream().filter(u -> !u.isDeleted()).collect(Collectors.toList()));
     }
 
     // Auxiliary functions

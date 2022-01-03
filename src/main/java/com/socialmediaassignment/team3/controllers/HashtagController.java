@@ -17,8 +17,6 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/tags")
 public class HashtagController {
-    private final HashtagRepository hashtagRepository;
-    private final HashtagMapper hashtagMapper;
     private final HashtagService hashtagService;
 
     @GetMapping

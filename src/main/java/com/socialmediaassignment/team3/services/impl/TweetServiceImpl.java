@@ -10,6 +10,7 @@ import com.socialmediaassignment.team3.entities.Tweet;
 import com.socialmediaassignment.team3.entities.User;
 import com.socialmediaassignment.team3.entities.embeddable.Credential;
 import com.socialmediaassignment.team3.exceptions.BadRequestException;
+import com.socialmediaassignment.team3.exceptions.NotFoundException;
 import com.socialmediaassignment.team3.exceptions.UnauthorizedException;
 import com.socialmediaassignment.team3.mappers.TweetMapper;
 import com.socialmediaassignment.team3.mappers.UserMapper;
@@ -135,6 +136,54 @@ public class TweetServiceImpl implements TweetService {
         return userMapper.entitiesToDtos(tweet.getLikes().stream().filter(u -> !u.isDeleted()).collect(Collectors.toList()));
     }
 
+    @Override
+    public List<TweetResponseDto> getUserTweets(String username) {
+        User user = _getUserByUsername(username);
+        if (user == null || user.isDeleted())
+            throw new NotFoundException("User not found");
+
+        List<Tweet> response = user.getTweets().stream().filter(t -> !t.isDeleted()).collect(Collectors.toList());
+        response.sort(Comparator.comparing(Tweet::getPosted));
+        Collections.reverse(response);
+        return tweetMapper.entitiesToDtos(response);
+    }
+
+    @Override
+    public List<TweetResponseDto> getTweetsByMention(String username) {
+        User user = _getUserByUsername(username);
+        if (user == null || user.isDeleted())
+            throw new NotFoundException("User not found");
+
+        List<Tweet> response = user.getMentions().stream().filter(t -> !t.isDeleted()).collect(Collectors.toList());
+        response.sort(Comparator.comparing(Tweet::getPosted));
+        Collections.reverse(response);
+        return tweetMapper.entitiesToDtos(response);
+    }
+
+    @Override
+    public List<TweetResponseDto> getUserFeed(String username) {
+        User user = _getUserByUsername(username);
+        if (user == null || user.isDeleted())
+            throw new NotFoundException("User not found");
+
+        Queue<User> userQueue = new LinkedList<>();
+
+        userQueue.add(user);
+        userQueue.addAll(user.getFollowing());
+        Set<Tweet> tweetSet = new HashSet<>();
+
+        while(!userQueue.isEmpty()) {
+            User author = userQueue.poll();
+            if (!author.isDeleted()) {
+                tweetSet.addAll(author.getTweets().stream().filter(t -> !t.isDeleted()).collect(Collectors.toList()));
+            }
+        }
+
+        List<Tweet> response = new ArrayList<>(tweetSet);
+        response.sort(Comparator.comparing(Tweet::getPosted));
+        Collections.reverse(response);
+        return tweetMapper.entitiesToDtos(response);
+    }
 
     private User _authorizeCredential(Credential credential) {
         Optional<User> userOptional = userRepository.findOneByCredential(credential);
@@ -195,11 +244,23 @@ public class TweetServiceImpl implements TweetService {
             tweet.addHashtag(hashtag);
         }
 
+        Set<Hashtag> hashtagSet = new HashSet<>(tweet.getHashtags());
+        for (Hashtag hashtag : hashtagSet) {
+            if (!tagLabels.contains(hashtag.getLabel()))
+                tweet.removeHashtag(hashtag);
+        }
+
         for (String username : mentions) {
             User user = _getUserByUsername(username);
             if (user == null)
                 continue;
             tweet.addMentionedUser(user);
+        }
+
+        Set<User> mentionSet = new HashSet<>(tweet.getUsersMentioned());
+        for (User mention : mentionSet) {
+            if (!mentions.contains(mention.getCredential().getUsername()))
+                tweet.removeMentionedUser(mention);
         }
     }
 
